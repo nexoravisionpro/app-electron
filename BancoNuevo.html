@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Norvex Capital | Banca de Inversión y Crédito Corporativo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    
+    <style>
+        :root {
+            --bg-pure: #FFFFFF;
+            --bg-sky: #F0F9FF;
+            --navy: #0F172A;
+            --blue-accent: #2563EB;
+            --blue-light: #7DD3FC;
+            --gold: #B59410;
+            --emerald: #10B981;
+            --border: #E2E8F0;
+            --text-muted: #64748B;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-pure); color: var(--navy); line-height: 1.6; overflow-x: hidden; }
+
+        /* --- NAVEGACIÓN --- */
+        nav { background: rgba(255, 255, 255, 0.98); height: 80px; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border); backdrop-filter: blur(10px); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--navy); text-decoration: none; transition: 0.3s; }
+        .logo span { color: var(--blue-accent); }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a.link-text { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; transition: 0.3s; }
+        .nav-links a.link-text:hover { color: var(--blue-accent); }
+        .btn-access { background: var(--navy); color: #fff; padding: 12px 25px; border-radius: 50px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 0.85rem; }
+        .btn-access:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(15, 23, 42, 0.15); }
+
+        /* --- HERO --- */
+        .hero { padding: clamp(120px, 15vw, 180px) 5% clamp(80px, 10vw, 120px); text-align: center; background: radial-gradient(circle at top, #E0F2FE 0%, #FFFFFF 70%); }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 6vw, 5rem); line-height: 1.1; margin-bottom: 25px; color: var(--navy); }
+        .hero span { color: var(--blue-accent); }
+        .hero p { max-width: 750px; margin: 0 auto 40px; font-size: clamp(1rem, 2vw, 1.2rem); color: var(--text-muted); }
+        .hero-btns { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; width: 100%; }
+
+        /* --- VISIÓN INSTITUCIONAL --- */
+        .vision-section { background: var(--navy); color: #fff; padding: 100px 5%; border-radius: 60px 60px 0 0; text-align: center; }
+        .vision-container { max-width: 1000px; margin: 0 auto; }
+        .vision-container h2 { font-size: clamp(2rem, 5vw, 2.8rem); margin-bottom: 20px; font-family: 'Playfair Display'; color: var(--blue-light); }
+        .vision-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 50px; }
+        .vision-item { background: rgba(255,255,255,0.03); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .vision-item h4 { color: var(--gold); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* --- SECCIÓN CRÉDITO CORPORATIVO --- */
+        .credit-banner { background: var(--bg-sky); border-radius: 40px; padding: clamp(40px, 5vw, 60px) 5%; text-align: center; border: 1px solid var(--blue-light); margin: 80px auto; max-width: 1200px; width: 90%;}
+        .credit-banner h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 2.8rem); color: var(--navy); margin-bottom: 20px; }
+        .credit-banner p { max-width: 700px; margin: 0 auto 30px; color: var(--text-muted); font-size: 1.1rem; }
+
+        /* --- SECCIÓN PORTAFOLIO --- */
+        .section { padding: clamp(60px, 8vw, 100px) 5%; max-width: 1400px; margin: 0 auto; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 5vw, 3.2rem); text-align: center; margin-bottom: 50px; }
+
+        .grid-assets { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        .card-asset { background: #fff; border: 1px solid var(--border); border-radius: 24px; padding: 30px; transition: 0.4s; display: flex; flex-direction: column; }
+        .card-asset:hover { transform: translateY(-10px); border-color: var(--blue-light); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        .bursatil-badge { background: #fee2e2; color: #ef4444; font-size: 0.65rem; font-weight: 800; padding: 5px 12px; border-radius: 6px; display: inline-block; margin-bottom: 15px; }
+
+        /* --- APP BANCARIA OVERLAY --- */
+        #bankApp { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-pure); z-index: 5000; overflow: hidden; }
+        .app-container { display: flex; height: 100%; width: 100%; }
+        .app-sidebar { width: 280px; background: var(--bg-sky); border-right: 1px solid var(--border); padding: 40px 20px; display: flex; flex-direction: column; }
+        .app-sidebar .logo { margin-bottom: 40px; text-align: center; font-size: 1.2rem; }
+        .app-main { flex-grow: 1; padding: 60px 5%; overflow-y: auto; background: var(--bg-pure); }
+        
+        .nav-item { padding: 15px 20px; border-radius: 12px; cursor: pointer; margin-bottom: 8px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 12px; transition: 0.2s; font-size: 0.95rem; }
+        .nav-item:hover { background: #E0F2FE; color: var(--blue-accent); }
+        .nav-item.active { background: var(--navy); color: #fff; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); }
+
+        .view-pane { display: none; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.4s ease; }
+        .view-pane.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* =========================================================
+           WIDGET CARTERA PREMIUM (100% ADAPTATIVO)
+           ========================================================= */
+        .mobile-wallet-wrapper {
+            width: 100%;
+            max-width: 420px; /* Ancho en PC */
+            margin: 0 auto 40px auto;
+            background-color: var(--navy);
+            border-radius: 40px;
+            border: 8px solid #cbd5e1; /* Marco de teléfono en PC */
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.5);
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .mw-header { display: flex; justify-content: space-between; align-items: center; padding: 30px 20px 15px; }
+        .mw-profile { display: flex; align-items: center; gap: 12px; }
+        .mw-avatar { width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, var(--blue-accent), #8b5cf6); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: white; }
+        .mw-greeting h1 { font-size: 13px; color: #94a3b8; font-weight: 500; margin:0; line-height:1.2;}
+        .mw-greeting h2 { font-size: 15px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; margin:0;}
+        
+        .mw-balance-section { padding: 10px 20px 20px; }
+        .mw-balance-card { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; padding: 25px 20px; position: relative; overflow: hidden; }
+        .mw-balance-label { font-size: 13px; color: #94a3b8; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .mw-balance-amount { font-size: clamp(28px, 8vw, 32px); font-weight: 800; color: #ffffff; display: flex; align-items: baseline; gap: 4px; }
+        .mw-balance-amount span.cents { font-size: clamp(16px, 5vw, 20px); color: #94a3b8; }
+        .mw-balance-amount span.currency { font-size: 14px; font-weight: 600; color: var(--emerald); margin-left: 5px; }
+        
+        .mw-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 20px 25px; }
+        .mw-btn { display: flex; flex-direction: column; align-items: center; gap: 8px; background: none; border: none; cursor: pointer; color:#fff;}
+        .mw-icon { width: clamp(45px, 12vw, 50px); height: clamp(45px, 12vw, 50px); border-radius: 16px; background-color: #1e293b; color: var(--blue-light); font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .mw-icon.transfer { background-color: var(--blue-accent); color: white; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
+        .mw-btn:active .mw-icon { transform: scale(0.92); }
+        .mw-label { font-size: 11px; font-weight: 500; }
+        
+        .mw-transactions { padding: 0 20px 30px; }
+        .mw-tx-header { font-size: 16px; font-weight: 600; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .mw-tx-header a { font-size: 13px; color: var(--blue-light); text-decoration: none; }
+        .mw-tx-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .mw-tx-left { display: flex; align-items: center; gap: 12px; }
+        .mw-tx-icon { width: 38px; height: 38px; border-radius: 12px; background-color: #1e293b; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .mw-tx-details h4 { font-size: 14px; font-weight: 600; margin:0;}
+        .mw-tx-details p { font-size: 11px; color: #94a3b8; margin:0;}
+        .mw-tx-amount { font-weight: 600; font-size: 14px; }
+        .mw-tx-amount.positive { color: var(--emerald); }
+        
+        /* Modal Transferencia dentro del Widget */
+        .mw-modal { position: absolute; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .mw-modal.active { opacity: 1; pointer-events: all; }
+        .mw-modal-content { background: var(--navy); width: 100%; border-radius: 24px 24px 0 0; padding: 25px 20px 30px; transform: translateY(100%); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .mw-modal.active .mw-modal-content { transform: translateY(0); }
+        .mw-input-group { margin-bottom: 15px; text-align: left; }
+        .mw-input-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 6px; font-weight:600;}
+        .mw-input { width: 100%; padding: 15px; border-radius: 10px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: white; font-size: 16px; outline: none; } /* Font size 16px evita zoom en iOS */
+        .mw-submit { width: 100%; padding: 16px; border-radius: 12px; background: var(--blue-accent); color: white; font-size: 16px; font-weight: 600; border: none; cursor: pointer; margin-top: 10px; }
+
+        /* Estilos generales de Formularios */
+        .form-card { max-width: 600px; background: var(--bg-sky); padding: clamp(20px, 5vw, 50px); border-radius: 30px; border: 1px solid var(--border); margin: 20px auto; }
+        .form-group { margin-bottom: 20px; text-align: left;}
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;}
+        .bank-input { width: 100%; padding: 16px; border: 1px solid var(--border); border-radius: 12px; font-family: inherit; font-size: 16px; color: var(--navy); background: #fff; transition: 0.3s; }
+        .btn-confirm { width: 100%; padding: 20px; background: var(--navy); color: #fff; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 1rem; transition: 0.3s; margin-top: 10px; }
+
+        /* =========================================
+           MEDIA QUERIES - 100% ADAPTATIVO
+           ========================================= */
+        @media (max-width: 1024px) {
+            .vision-section { border-radius: 40px 40px 0 0; }
+        }
+
+        @media (max-width: 768px) {
+            nav { height: 70px; padding: 0 15px; }
+            .nav-links a.link-text { display: none; }
+            .btn-access { padding: 10px 16px; font-size: 0.75rem; margin-left: 10px; }
+            .logo { font-size: 1.3rem; }
+            .hero-btns .btn-access { width: 100%; }
+            
+            /* App Bancaria a Bottom Tab Bar */
+            .app-container { flex-direction: column-reverse; }
+            .app-main { padding: 20px 15px 100px; } /* Ajuste de padding para no tapar contenido */
+            
+            .app-sidebar { 
+                width: 100%; height: 80px; flex-direction: row; padding: 10px 5px; 
+                justify-content: space-around; border-right: none; border-top: 1px solid var(--border); 
+                background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px);
+                position: fixed; bottom: 0; left: 0; z-index: 6000;
+                box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            }
+            .app-sidebar .logo { display: none; }
+            
+            .nav-item { flex-direction: column; padding: 5px; gap: 4px; font-size: 0.7rem; margin: 0; border-radius: 8px; flex: 1; text-align: center; justify-content: center; background: transparent !important; color: var(--text-muted); }
+            .nav-item.active { color: var(--blue-accent); font-weight: 700; }
+            .nav-item span.icon { font-size: 1.4rem; display: block; margin-bottom: 2px; }
+            #nav-exit span.text { display: none; }
+            #nav-exit { flex: 0.5; }
+            
+            /* MAGIA DE LA CARTERA EN MÓVIL: Quitar marco y expandir 100% */
+            .mobile-wallet-wrapper { 
+                max-width: 100%; /* Ancho total */
+                border: none; /* Elimina el borde gris grueso de "teléfono" */
+                border-radius: 20px; /* Bordes suaves estilo app nativa */
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                margin-top: 10px;
+            }
+            .mw-header { padding: 20px 15px 10px; }
+            .mw-balance-section { padding: 10px 15px 20px; }
+            .mw-actions { padding: 0 15px 20px; gap: 5px; }
+            .mw-transactions { padding: 0 15px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="#" class="logo">NORVEX<span>.</span></a>
+    <div class="nav-links">
+        <a href="#ecosistema" class="link-text">Portafolio</a>
+        <a href="#vision" class="link-text">Nosotros</a>
+        <button class="btn-access" onclick="openApp('register')">Apertura Fondo</button>
+        <button class="btn-access" style="background:transparent; color:var(--navy); border:1.5px solid var(--navy);" onclick="openApp('login')">Mi Cartera</button>
+    </div>
+</nav>
+
+<section class="hero">
+    <div style="background: var(--blue-light); display: inline-block; padding: 6px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; margin-bottom: 25px; color: var(--navy); letter-spacing: 1px;">SISTEMA BANCARIO INSTITUCIONAL</div>
+    <h1>Invierte en el <span>Futuro</span><br>del Capital Real</h1>
+    <p>Gestión institucional de activos con transparencia absoluta. Vincula tu capital a los sectores más rentables de la economía global o financia la expansión de tu empresa.</p>
+    <div class="hero-btns">
+        <button class="btn-access" style="padding: 20px 40px; font-size: 1rem; background: var(--blue-accent);" onclick="openApp('register')">Iniciar Expediente de Socio</button>
+    </div>
+</section>
+
+<section class="section" id="ecosistema">
+    <h2 class="section-title">Portafolio de Activos</h2>
+    <div class="grid-assets" id="assetGrid">
+        </div>
+</section>
+
+<div id="bankApp">
+    <div class="app-container">
+        <aside class="app-sidebar">
+            <div class="logo" style="margin-bottom: 40px; font-size: 1.2rem; color:var(--navy); text-align: center;">NORVEX <span>APP</span></div>
+            
+            <div class="nav-item" id="nav-register" onclick="switchView('register')">
+                <span class="icon">📝</span><span class="text">Abrir Fondo</span>
+            </div>
+            <div class="nav-item" id="nav-invest" onclick="switchView('invest')">
+                <span class="icon">📈</span><span class="text">Invertir</span>
+            </div>
+            <div class="nav-item" id="nav-login" onclick="switchView('login')">
+                <span class="icon">👤</span><span class="text">Mi Cartera</span>
+            </div>
+            
+            <div class="nav-item" id="nav-exit" onclick="closeApp()" style="margin-top: auto; color: #EF4444; background: transparent;">
+                <span class="icon">✕</span><span class="text">Salir</span>
+            </div>
+        </aside>
+
+        <main class="app-main">
+            <div id="view-register" class="view-pane">
+                <h2 style="font-family:'Playfair Display'; font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: 10px;">Apertura de Cuenta</h2>
+                <p style="color:var(--text-muted); margin-bottom: 20px;">Complete el formulario para generar su ID de Inversionista.</p>
+                <div class="form-card">
+                    <form>
+                        <div class="form-group">
+                            <label>NOMBRE COMPLETO</label>
+                            <input type="text" class="bank-input" placeholder="Titular de la cuenta" required>
+                        </div>
+                        <div class="form-group">
+                            <label>CORREO ELECTRÓNICO</label>
+                            <input type="email" class="bank-input" placeholder="correo@ejemplo.com" required>
+                        </div>
+                        <button type="button" class="btn-confirm" style="background:var(--blue-accent);">REGISTRAR</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-invest" class="view-pane">
+                <h2 style="font-family:'Playfair Display'; font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: 10px;">Vincular Capital</h2>
+                <p style="color:var(--text-muted); margin-bottom: 20px;">Defina a qué activo se dirigirá su balance disponible.</p>
+                <div class="form-card" style="border-color: var(--emerald);">
+                    <form>
+                        <div class="form-group">
+                            <label>SU ID DE SOCIO</label>
+                            <input type="text" class="bank-input" placeholder="NVX-XXXX" required>
+                        </div>
+                        <div class="form-group">
+                            <label>MONTO A VINCULAR (MXN)</label>
+                            <input type="number" class="bank-input" placeholder="$ 0.00" required>
+                        </div>
+                        <button type="button" class="btn-confirm" style="background:var(--emerald);">CONFIRMAR VINCULACIÓN</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-login" class="view-pane">
+                <h2 style="font-family:'Playfair Display'; font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: 20px; color: var(--navy); text-align: center;">Banca Digital Institucional</h2>
+                
+                <div class="mobile-wallet-wrapper">
+                    <div class="mw-header">
+                        <div class="mw-profile">
+                            <div class="mw-avatar">CP</div>
+                            <div class="mw-greeting">
+                                <h1>Hola de nuevo,</h1>
+                                <h2>Cristian Guadalupe Puente Mendoza</h2>
+                            </div>
+                        </div>
+                        <div style="font-size: 20px; color: #94a3b8;"><i class="fa-regular fa-bell"></i></div>
+                    </div>
+
+                    <div class="mw-balance-section">
+                        <div class="mw-balance-card">
+                            <div class="mw-balance-label">
+                                Balance Institucional
+                                <i class="fa-solid fa-eye" id="mw-toggle" style="cursor: pointer; font-size: 16px; padding: 5px;"></i>
+                            </div>
+                            <div class="mw-balance-amount" id="mw-balance">
+                                $3,467,523<span class="cents">.67</span><span class="currency">MXN</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mw-actions">
+                        <button class="mw-btn" onclick="abrirModalTransferencia()">
+                            <div class="mw-icon transfer"><i class="fa-solid fa-arrow-right-arrow-left"></i></div>
+                            <span class="mw-label">Transferir</span>
+                        </button>
+                        <button class="mw-btn">
+                            <div class="mw-icon"><i class="fa-solid fa-plus"></i></div>
+                            <span class="mw-label">Depositar</span>
+                        </button>
+                        <button class="mw-btn">
+                            <div class="mw-icon"><i class="fa-solid fa-file-invoice"></i></div>
+                            <span class="mw-label">Estado</span>
+                        </button>
+                        <button class="mw-btn" onclick="switchView('invest')">
+                            <div class="mw-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                            <span class="mw-label">Invertir</span>
+                        </button>
+                    </div>
+
+                    <div class="mw-transactions">
+                        <div class="mw-tx-header">
+                            Movimientos
+                            <a href="#">Ver todos</a>
+                        </div>
+                        <div class="mw-tx-item">
+                            <div class="mw-tx-left">
+                                <div class="mw-tx-icon" style="color: #10b981; background: rgba(16,185,129,0.1);"><i class="fa-solid fa-arrow-down"></i></div>
+                                <div class="mw-tx-details">
+                                    <h4>Rendimiento Agro Simentan</h4>
+                                    <p>Abono mensual operativo</p>
+                                </div>
+                            </div>
+                            <div class="mw-tx-amount positive">+$124,500.00</div>
+                        </div>
+                        <div class="mw-tx-item">
+                            <div class="mw-tx-left">
+                                <div class="mw-tx-icon" style="color: #3b82f6; background: rgba(59,130,246,0.1);"><i class="fa-solid fa-building-columns"></i></div>
+                                <div class="mw-tx-details">
+                                    <h4>Fondeo de Capital</h4>
+                                    <p>Transferencia SPEI entrante</p>
+                                </div>
+                            </div>
+                            <div class="mw-tx-amount positive">+$3,000,000.00</div>
+                        </div>
+                    </div>
+
+                    <div class="mw-modal" id="modalTransfer">
+                        <div class="mw-modal-content">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                                <h3 style="font-size:18px;">Retiro de Fondos</h3>
+                                <i class="fa-solid fa-xmark" style="font-size:24px; cursor:pointer; color:#94a3b8; padding: 5px;" onclick="cerrarModalTransferencia()"></i>
+                            </div>
+                            <div class="mw-input-group">
+                                <label>CLABE DE DESTINO</label>
+                                <input type="number" class="mw-input" placeholder="012 345 6789 0123 4567">
+                            </div>
+                            <div class="mw-input-group">
+                                <label>MONTO A RETIRAR (MXN)</label>
+                                <input type="number" class="mw-input" placeholder="$0.00">
+                            </div>
+                            <button class="mw-submit" id="btnProcesarTx" onclick="simularTransferencia()">AUTORIZAR RETIRO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // --- LÓGICA DE LA CARTERA PREMIUM ---
+    const toggleBtn = document.getElementById('mw-toggle');
+    const balanceDisplay = document.getElementById('mw-balance');
+    let isHidden = false;
+
+    toggleBtn.addEventListener('click', () => {
+        isHidden = !isHidden;
+        if (isHidden) {
+            balanceDisplay.innerHTML = '*********';
+            toggleBtn.classList.remove('fa-eye');
+            toggleBtn.classList.add('fa-eye-slash');
+        } else {
+            balanceDisplay.innerHTML = '$3,467,000<span class="cents">.67</span><span class="currency">MXN</span>';
+            toggleBtn.classList.remove('fa-eye-slash');
+            toggleBtn.classList.add('fa-eye');
+        }
+    });
+
+    const modalTransfer = document.getElementById('modalTransfer');
+    function abrirModalTransferencia() { modalTransfer.classList.add('active'); }
+    function cerrarModalTransferencia() { modalTransfer.classList.remove('active'); }
+
+    function simularTransferencia() {
+        const btn = document.getElementById('btnProcesarTx');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
+        
+        setTimeout(() => {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Retiro Exitoso';
+            btn.style.backgroundColor = '#10b981'; 
+            
+            setTimeout(() => {
+                cerrarModalTransferencia();
+                setTimeout(() => {
+                    btn.innerHTML = 'AUTORIZAR RETIRO';
+                    btn.style.backgroundColor = 'var(--blue-accent)';
+                }, 400);
+            }, 1500);
+        }, 1500);
+    }
+
+    // --- BASE DE DATOS ACTIVOS ---
+    const ASSETS = [
+        { name: "Agro Simentan", cat: "Agrotech", tir: "24.5%", val: "$2.15", isB: false, desc: "Producción hidropónica y exportación." },
+        { name: "Nexora Tech", cat: "Fintech", tir: "19.2%", val: "$0.32", isB: false, desc: "Infraestructura Cloud B2B." }
+    ];
+
+    function init() {
+        const grid = document.getElementById('assetGrid');
+        ASSETS.forEach(a => {
+            grid.innerHTML += `
+                <div class="card-asset">
+                    ${a.isB ? '<span class="bursatil-badge">Cotiza en Bolsa</span>' : '<span style="color:var(--emerald); font-size:0.65rem; font-weight:800; display:inline-block; margin-bottom:15px; background:#dcfce7; padding:4px 10px; border-radius:4px;">ACTIVO PRIVADO</span>'}
+                    <h3 style="color:var(--navy); font-size:1.5rem;">${a.name}</h3>
+                    <p style="color:var(--text-muted); font-size:0.95rem; margin-bottom:20px;">${a.desc}</p>
+                    <div style="display:flex; justify-content:space-between;">
+                        <div>
+                            <small style="display:block; font-size:0.65rem; color:#94a3b8; font-weight:700;">RENDIMIENTO</small>
+                            <span style="font-weight:700; color:var(--emerald); font-size:1.1rem;">${a.tir}</span>
+                        </div>
+                    </div>
+                    <button class="btn-access" style="width:100%; margin-top:20px; font-size:0.85rem; background:var(--navy);" onclick="openApp('invest')">Vincular Capital</button>
+                </div>
+            `;
+        });
+    }
+
+    // NAVEGACIÓN APP OVERLAY
+    function openApp(view) { 
+        document.getElementById('bankApp').style.display = 'block'; 
+        document.body.style.overflow = 'hidden'; 
+        switchView(view); 
+    }
+    function closeApp() { 
+        document.getElementById('bankApp').style.display = 'none'; 
+        document.body.style.overflow = 'auto'; 
+    }
+    function switchView(id) {
+        document.querySelectorAll('.view-pane').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        if(document.getElementById('nav-' + id)) { document.getElementById('nav-' + id).classList.add('active'); }
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>

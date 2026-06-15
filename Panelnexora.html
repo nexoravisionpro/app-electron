@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexora Alliance | Business Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F0F2F5;
+            --card: #FFFFFF;
+            --blue: #0866FF;
+            --blue-hover: #0054D1;
+            --blue-light: #E7F3FF;
+            --blue-mid: #BFE0FF;
+            --text: #050505;
+            --muted: #65676B;
+            --border: #E4E6EB;
+            --border-dark: #CED0D4;
+            --success: #1A8A3A;
+            --success-bg: #E6F4EA;
+            --warning: #E8710A;
+            --warning-bg: #FFF3E0;
+            --red: #E41E1E;
+            --shadow-xs: 0 1px 2px rgba(0,0,0,0.07);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 24px rgba(0,0,0,0.10);
+            --radius: 10px;
+            --radius-sm: 6px;
+            --transition: all 0.18s cubic-bezier(.4,0,.2,1);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            font-size: 15px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .logo { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        .hidden { display: none !important; }
+
+        /* ── BUTTONS ── */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+            padding: 10px 18px; border-radius: var(--radius-sm); font-weight: 600;
+            font-size: 14px; cursor: pointer; transition: var(--transition); border: none;
+            font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -.01em;
+            white-space: nowrap;
+        }
+        .btn:active { transform: scale(.98); }
+        .btn-primary { background: var(--blue); color: #fff; }
+        .btn-primary:hover { background: var(--blue-hover); box-shadow: 0 4px 14px rgba(8,102,255,.3); }
+        .btn-secondary { background: #E4E6EB; color: var(--text); }
+        .btn-secondary:hover { background: #D8DADF; }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border-dark); }
+        .btn-ghost:hover { background: var(--bg); }
+        .btn-sm { padding: 7px 13px; font-size: 13px; }
+        .btn-full { width: 100%; }
+
+        /* ── INPUTS ── */
+        .form-group { margin-bottom: 14px; }
+        .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .04em; }
+        .form-input {
+            width: 100%; padding: 11px 13px; background: #fff;
+            border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+            color: var(--text); font-size: 14.5px; transition: var(--transition);
+            font-family: 'DM Sans', sans-serif;
+        }
+        .form-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(8,102,255,.12); }
+        .form-input::placeholder { color: #AEBAC7; }
+        textarea.form-input { resize: vertical; min-height: 110px; line-height: 1.55; background: #FAFBFC; }
+        .input-prefix { position: relative; }
+        .input-prefix .prefix { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-weight: 600; font-size: 15px; pointer-events: none; }
+        .input-prefix .form-input { padding-left: 26px; }
+
+        /* ── BADGE ── */
+        .badge {
+            display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+            border-radius: 100px; font-size: 12px; font-weight: 700; letter-spacing: .02em;
+        }
+        .badge-blue { background: var(--blue-light); color: var(--blue); }
+        .badge-success { background: var(--success-bg); color: var(--success); }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); }
+
+        /* ── DIVIDER ── */
+        .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+        /* ══════════════════════════════════════════
+           LOGIN VIEW
+        ══════════════════════════════════════════ */
+        #login-view {
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; padding: 24px;
+            background: var(--bg);
+        }
+        .login-brand { text-align: center; margin-bottom: 28px; }
+        .login-brand .logo { font-size: 30px; font-weight: 800; color: var(--blue); letter-spacing: -.5px; }
+        .login-brand p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+        .login-card {
+            background: var(--card); width: 100%; max-width: 400px;
+            padding: 36px 28px; border-radius: 14px;
+            box-shadow: var(--shadow-md); border: 1px solid var(--border);
+        }
+        .login-title { font-size: 19px; font-weight: 800; text-align: center; margin-bottom: 6px; }
+        .login-sub { font-size: 13.5px; color: var(--muted); text-align: center; margin-bottom: 28px; }
+
+        .login-alert {
+            display: flex; gap: 10px; align-items: center; background: #FFF1F0;
+            border: 1px solid #FFCCCC; border-radius: var(--radius-sm); padding: 11px 14px;
+            font-size: 13px; color: var(--red); margin-bottom: 16px; font-weight: 500;
+        }
+        .login-alert.hidden { display: none !important; }
+
+        .forgot-link { font-size: 13px; color: var(--blue); text-align: right; display: block; margin-top: 6px; cursor: pointer; text-decoration: none; }
+        .forgot-link:hover { text-decoration: underline; }
+
+        .login-footer { text-align: center; margin-top: 20px; font-size: 13px; color: var(--muted); }
+
+        /* ══════════════════════════════════════════
+           DASHBOARD
+        ══════════════════════════════════════════ */
+        #dashboard-view { display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* TOPBAR */
+        .topbar {
+            display: none; align-items: center; justify-content: space-between;
+            background: var(--card); padding: 14px 20px;
+            border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100;
+            box-shadow: var(--shadow-xs);
+        }
+        .topbar-logo { font-size: 20px; font-weight: 800; color: var(--blue); }
+        .btn-hamburger {
+            background: none; border: 1.5px solid var(--border-dark); border-radius: 8px;
+            padding: 6px 10px; cursor: pointer; color: var(--text); font-size: 18px; line-height: 1;
+        }
+
+        .app-wrap { display: flex; flex: 1; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 252px; background: var(--card); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; position: fixed;
+            height: 100vh; left: 0; top: 0; z-index: 200;
+            transition: transform .28s cubic-bezier(.4,0,.2,1);
+        }
+        .sidebar-top { padding: 22px 18px 18px; border-bottom: 1px solid var(--border); }
+        .sidebar-logo { font-size: 22px; font-weight: 800; color: var(--blue); letter-spacing: -.3px; }
+        .sidebar-sub { font-size: 11.5px; font-weight: 600; color: var(--muted); margin-top: 2px; letter-spacing: .04em; text-transform: uppercase; }
+
+        .sidebar-user {
+            display: flex; align-items: center; gap: 10px;
+            padding: 14px 18px; border-bottom: 1px solid var(--border);
+            background: var(--bg);
+        }
+        .user-avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: var(--blue-light);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px; color: var(--blue); flex-shrink: 0;
+        }
+        .user-name { font-size: 13.5px; font-weight: 700; }
+        .user-role { font-size: 11.5px; color: var(--muted); }
+
+        .nav-section-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; padding: 16px 18px 6px; }
+        .nav-list { list-style: none; padding: 0 10px; }
+        .nav-item { margin-bottom: 2px; }
+        .nav-link {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+            color: var(--text); text-decoration: none; border-radius: var(--radius-sm);
+            transition: var(--transition); font-size: 14px; font-weight: 500;
+        }
+        .nav-link:hover { background: var(--bg); }
+        .nav-link.active { background: var(--blue-light); color: var(--blue); font-weight: 700; }
+        .nav-link .nav-icon { font-size: 18px; width: 22px; text-align: center; flex-shrink: 0; }
+
+        .sidebar-footer { padding: 14px; border-top: 1px solid var(--border); margin-top: auto; }
+
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(5,5,5,.45); z-index: 150;
+            opacity: 0; transition: opacity .28s ease;
+            backdrop-filter: blur(2px);
+        }
+
+        /* MAIN */
+        .main { flex: 1; margin-left: 252px; padding: 32px 36px; min-width: 0; }
+
+        /* Page Header */
+        .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .page-title { font-size: 23px; font-weight: 800; letter-spacing: -.3px; }
+        .page-sub { font-size: 13.5px; color: var(--muted); margin-top: 3px; }
+
+        /* INFO BANNER */
+        .info-banner {
+            display: flex; gap: 14px; align-items: flex-start;
+            background: var(--blue-light); border: 1px solid var(--blue-mid);
+            border-left: 4px solid var(--blue); border-radius: var(--radius);
+            padding: 15px 18px; margin-bottom: 28px;
+        }
+        .info-banner .icon { color: var(--blue); font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+        .info-banner h4 { font-size: 14px; font-weight: 700; color: #00449E; margin-bottom: 3px; }
+        .info-banner p { font-size: 13px; color: #0054D1; line-height: 1.45; }
+
+        /* GRID */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+        .grid-col { display: flex; flex-direction: column; gap: 22px; }
+
+        /* PANEL CARD */
+        .card {
+            background: var(--card); border-radius: var(--radius);
+            border: 1px solid var(--border); box-shadow: var(--shadow-xs);
+        }
+        .card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 18px; border-bottom: 1px solid var(--border);
+        }
+        .card-title { font-size: 15px; font-weight: 800; letter-spacing: -.1px; display: flex; align-items: center; gap: 8px; }
+        .card-title .card-icon { font-size: 17px; }
+        .card-body { padding: 20px 18px; }
+
+        /* CALC RESULT */
+        .calc-result {
+            background: var(--success-bg); border: 1.5px dashed #A8D8B5; border-radius: var(--radius-sm);
+            padding: 18px 16px; text-align: center; margin-top: 14px; transition: var(--transition);
+        }
+        .calc-result .label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--success); margin-bottom: 6px; }
+        .calc-result .amount { font-size: 30px; font-weight: 800; color: var(--success); font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -.5px; }
+        .calc-result .currency { font-size: 13px; color: var(--success); opacity: .75; margin-top: 2px; }
+
+        /* SCRIPT BTNS */
+        .script-type-btns { display: flex; gap: 8px; margin-bottom: 14px; }
+        .script-type-btns .btn { flex: 1; }
+
+        /* COPY FEEDBACK */
+        .copy-btn { transition: var(--transition); }
+
+        /* LEADS TABLE (visual extra) */
+        .leads-history { margin-top: 0; }
+        .leads-empty {
+            text-align: center; padding: 36px 20px; color: var(--muted); font-size: 13.5px;
+        }
+        .leads-empty .empty-icon { font-size: 36px; margin-bottom: 10px; }
+        .lead-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 11px 0; border-bottom: 1px solid var(--border); gap: 12px;
+            animation: slideIn .22s ease;
+        }
+        .lead-item:last-child { border-bottom: none; }
+        .lead-info .lead-name { font-size: 14px; font-weight: 700; }
+        .lead-info .lead-co { font-size: 12px; color: var(--muted); margin-top: 1px; }
+        .lead-time { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* TOAST */
+        .toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            display: flex; align-items: center; gap: 12px; background: var(--text);
+            color: #fff; padding: 13px 18px; border-radius: var(--radius);
+            box-shadow: var(--shadow-md); font-size: 14px; font-weight: 500; min-width: 240px;
+            animation: toastIn .25s ease;
+        }
+        .toast.success { background: var(--success); }
+        .toast .toast-icon { font-size: 18px; }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes toastOut {
+            to { opacity: 0; transform: translateY(8px); }
+        }
+
+        /* PROGRESS BAR (login loading) */
+        .loading-bar {
+            height: 3px; background: var(--blue); width: 0;
+            border-radius: 2px; transition: width .5s ease; margin-top: 14px; display: none;
+        }
+
+        /* STEP INDICATOR */
+        .step-dots { display: flex; gap: 5px; justify-content: center; margin-bottom: 20px; }
+        .step-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-dark); transition: var(--transition); }
+        .step-dot.active { background: var(--blue); width: 20px; border-radius: 3px; }
+
+        /* CHARACTER COUNTER */
+        .char-info { display: flex; justify-content: space-between; margin-top: 5px; }
+        .char-count { font-size: 11.5px; color: var(--muted); }
+
+        /* ══════════════════════════════════════════
+           RESPONSIVE
+        ══════════════════════════════════════════ */
+        @media (max-width: 900px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .topbar { display: flex; }
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.open { display: block; opacity: 1; }
+            .sidebar-top { display: none; }
+            .main { margin-left: 0; padding: 18px 16px; }
+            .page-header { gap: 8px; }
+            .page-title { font-size: 20px; }
+            .calc-result .amount { font-size: 26px; }
+            .toast-wrap { bottom: 16px; right: 16px; left: 16px; }
+            .toast { min-width: unset; }
+        }
+
+        @media (max-width: 480px) {
+            .login-card { padding: 28px 20px; }
+            .script-type-btns { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN VIEW
+══════════════════════════════════════ -->
+<div id="login-view">
+    <div class="login-brand">
+        <div class="logo">Nexora Alliance</div>
+        <p>Business Portal — Acceso exclusivo para socios</p>
+    </div>
+    <div class="login-card">
+        <h2 class="login-title">Bienvenido de nuevo</h2>
+        <p class="login-sub">Inicia sesión para acceder a tu panel de socios.</p>
+
+        <div class="login-alert hidden" id="loginError">
+            <span>⚠️</span> <span>Credenciales incorrectas. Intenta nuevamente.</span>
+        </div>
+
+        <form id="loginForm" novalidate>
+            <div class="form-group">
+                <label class="form-label">Correo electrónico o ID de socio</label>
+                <input type="text" id="loginUser" class="form-input" placeholder="nombre@empresa.com" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Contraseña</label>
+                <input type="password" id="loginPass" class="form-input" placeholder="••••••••" autocomplete="current-password">
+                <a class="forgot-link" href="#">¿Olvidaste tu contraseña?</a>
+            </div>
+            <div class="loading-bar" id="loginBar"></div>
+            <button type="submit" class="btn btn-primary btn-full" style="margin-top: 18px;" id="loginBtn">
+                Iniciar sesión
+            </button>
+        </form>
+        <p class="login-footer">¿Aún no eres socio? <a href="#" style="color:var(--blue);font-weight:600;">Contáctanos</a></p>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     DASHBOARD VIEW
+══════════════════════════════════════ -->
+<div id="dashboard-view" class="hidden">
+
+    <header class="topbar">
+        <div class="topbar-logo">Nexora</div>
+        <button class="btn-hamburger" id="btnHamburger">☰</button>
+    </header>
+
+    <div class="app-wrap">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-top">
+                <div class="sidebar-logo">Nexora Alliance</div>
+                <div class="sidebar-sub">Business Portal</div>
+            </div>
+
+            <div class="sidebar-user">
+                <div class="user-avatar" id="userAvatar">NX</div>
+                <div>
+                    <div class="user-name" id="userName">Socio Nexora</div>
+                    <div class="user-role">Referidor Activo</div>
+                </div>
+            </div>
+
+            <div class="nav-section-label">Principal</div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-view="ventas">
+                        <span class="nav-icon">🛠</span> Arsenal de Ventas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="leads">
+                        <span class="nav-icon">📋</span> Mis Prospectos
+                    </a>
+                </li>
+            </ul>
+
+            <div class="nav-section-label">Recursos</div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📈</span> Comisiones
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <span class="nav-icon">📖</span> Materiales
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <button id="btnLogout" class="btn btn-ghost btn-full btn-sm">
+                    ← Cerrar sesión
+                </button>
+            </div>
+        </aside>
+
+        <main class="main">
+
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Arsenal de Ventas B2B</h1>
+                    <p class="page-sub">Herramientas para gestionar y contactar a tus referidos.</p>
+                </div>
+                <div>
+                    <span class="badge badge-success">● Activo</span>
+                </div>
+            </div>
+
+            <div class="info-banner">
+                <span class="icon">ℹ️</span>
+                <div>
+                    <h4>Seguimiento Centralizado</h4>
+                    <p>Registra tus prospectos aquí. El estado de las negociaciones y la confirmación de comisiones llegarán a tu correo institucional vía nuestro equipo de dirección.</p>
+                </div>
+            </div>
+
+            <div class="grid-2">
+
+                <!-- LEFT COL -->
+                <div class="grid-col">
+
+                    <!-- REGISTRAR PROSPECTO -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><span class="card-icon">➕</span> Registrar Prospecto</div>
+                            <span class="badge badge-blue" id="leadsCountBadge">0 enviados</span>
+                        </div>
+                        <div class="card-body">
+                            <form id="leadForm" novalidate>
+                                <div class="form-group">
+                                    <label class="form-label">Nombre de la Empresa</label>
+                                    <input type="text" id="l_empresa" class="form-input" placeholder="Ej. Corporativo Legal S.C." required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Nombre del Directivo / Contacto</label>
+                                    <input type="text" id="l_contacto" class="form-input" placeholder="Ej. Lic. Roberto Gómez" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">WhatsApp del Contacto</label>
+                                    <input type="tel" id="l_telefono" class="form-input" placeholder="+52 477 000 0000" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Notas adicionales (opcional)</label>
+                                    <textarea id="l_notas" class="form-input" rows="2" placeholder="Sector, necesidades especiales, etc." style="min-height: 68px;"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full" id="leadSubmitBtn">
+                                    📲 Enviar a Nexora por WhatsApp
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- HISTORIAL -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><span class="card-icon">🕒</span> Prospectos Recientes</div>
+                        </div>
+                        <div class="card-body" style="padding: 0 18px;">
+                            <div id="leadsList">
+                                <div class="leads-empty" id="leadsEmpty">
+                                    <div class="empty-icon">📂</div>
+                                    <p>Aún no has registrado prospectos en esta sesión.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COL -->
+                <div class="grid-col">
+
+                    <!-- CALCULADORA -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><span class="card-icon">🧮</span> Calculadora de Comisión</div>
+                            <span class="badge badge-blue">10%</span>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">Calcula tu comisión de pago único según el valor estimado del proyecto.</p>
+                            <div class="form-group" style="margin-bottom: 4px;">
+                                <label class="form-label">Valor del proyecto (MXN)</label>
+                                <div class="input-prefix">
+                                    <span class="prefix">$</span>
+                                    <input type="number" id="calcInput" class="form-input" placeholder="0.00" min="0" step="1000">
+                                </div>
+                            </div>
+                            <div class="calc-result" id="calcResult">
+                                <div class="label">Tu comisión estimada</div>
+                                <div class="amount" id="calcOutput">$0.00</div>
+                                <div class="currency">MXN — Pago único</div>
+                            </div>
+                            <div id="calcBreakdown" class="hidden" style="margin-top: 12px; font-size: 13px; color: var(--muted); display: flex; gap: 8px; flex-wrap: wrap;">
+                                <span>Proyecto: <strong id="calcProj" style="color:var(--text)"></strong></span>
+                                <span>·</span>
+                                <span>Comisión 10%: <strong id="calcComm" style="color:var(--success)"></strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GENERADOR DE MENSAJES -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><span class="card-icon">💬</span> Generador de Mensajes B2B</div>
+                        </div>
+                        <div class="card-body">
+                            <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px;">Genera un mensaje persuasivo listo para copiar y enviar.</p>
+
+                            <div class="form-group">
+                                <label class="form-label">Nombre del prospecto</label>
+                                <input type="text" id="scriptName" class="form-input" placeholder="Ej. Carlos">
+                            </div>
+
+                            <div class="script-type-btns">
+                                <button class="btn btn-secondary btn-sm" id="btnScriptWA">📱 WhatsApp (Informal)</button>
+                                <button class="btn btn-secondary btn-sm" id="btnScriptLI">💼 LinkedIn (Formal)</button>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 6px;">
+                                <textarea id="scriptBox" class="form-input" readonly placeholder="El mensaje aparecerá aquí..."></textarea>
+                            </div>
+                            <div class="char-info">
+                                <span class="char-count" id="charCount">0 caracteres</span>
+                                <span class="char-count" id="wordCount">0 palabras</span>
+                            </div>
+
+                            <div style="display: flex; gap: 8px; margin-top: 12px;">
+                                <button id="btnCopyScript" class="btn btn-secondary copy-btn" style="flex: 1;">
+                                    📋 Copiar Mensaje
+                                </button>
+                                <button id="btnWhatsappScript" class="btn btn-primary copy-btn" style="flex: 1; font-size: 13px;">
+                                    📲 Enviar por WA
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+(function() {
+    /* ── UTILS ── */
+    function $(id) { return document.getElementById(id); }
+
+    function toast(msg, type = 'default', duration = 3000) {
+        const wrap = $('toastWrap');
+        const el = document.createElement('div');
+        el.className = `toast ${type}`;
+        el.innerHTML = `<span class="toast-icon">${type === 'success' ? '✅' : 'ℹ️'}</span><span>${msg}</span>`;
+        wrap.appendChild(el);
+        setTimeout(() => {
+            el.style.animation = 'toastOut .25s ease forwards';
+            setTimeout(() => el.remove(), 250);
+        }, duration);
+    }
+
+    function fmt(n) {
+        return '$' + n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function getTime() {
+        return new Date().toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    /* ── LEADS STORE ── */
+    let leads = [];
+    let leadsCount = 0;
+
+    function renderLeads() {
+        const list = $('leadsList');
+        const empty = $('leadsEmpty');
+        if (leads.length === 0) {
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+        // rebuild
+        const existing = list.querySelectorAll('.lead-item');
+        existing.forEach(e => e.remove());
+        leads.slice().reverse().forEach(lead => {
+            const item = document.createElement('div');
+            item.className = 'lead-item';
+            item.innerHTML = `
+                <div class="lead-info">
+                    <div class="lead-name">${lead.contacto}</div>
+                    <div class="lead-co">${lead.empresa} · ${lead.telefono}</div>
+                </div>
+                <div class="lead-time">${lead.time}</div>
+            `;
+            list.insertBefore(item, list.firstChild.nextSibling);
+        });
+        $('leadsCountBadge').textContent = `${leads.length} enviado${leads.length !== 1 ? 's' : ''}`;
+    }
+
+    /* ── LOGIN ── */
+    const loginView = $('login-view');
+    const dashView = $('dashboard-view');
+
+    $('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = $('loginUser').value.trim();
+        const pass = $('loginPass').value.trim();
+        const err = $('loginError');
+        const bar = $('loginBar');
+        const btn = $('loginBtn');
+
+        if (!user || !pass) {
+            err.classList.remove('hidden');
+            err.querySelector('span:last-child').textContent = 'Por favor completa todos los campos.';
+            return;
+        }
+
+        err.classList.add('hidden');
+        btn.textContent = 'Verificando...';
+        btn.disabled = true;
+        bar.style.display = 'block';
+        bar.style.width = '0';
+
+        setTimeout(() => { bar.style.width = '60%'; }, 50);
+        setTimeout(() => { bar.style.width = '90%'; }, 400);
+
+        setTimeout(() => {
+            bar.style.width = '100%';
+            setTimeout(() => {
+                // Set user display
+                const initials = user.substring(0, 2).toUpperCase();
+                $('userAvatar').textContent = initials;
+                $('userName').textContent = user.includes('@') ? user.split('@')[0] : user;
+
+                loginView.classList.add('hidden');
+                dashView.classList.remove('hidden');
+                bar.style.display = 'none';
+                bar.style.width = '0';
+                btn.textContent = 'Iniciar sesión';
+                btn.disabled = false;
+                this.reset();
+            }, 200);
+        }, 900);
+    });
+
+    $('btnLogout').addEventListener('click', () => {
+        dashView.classList.add('hidden');
+        loginView.classList.remove('hidden');
+        leads = [];
+        $('leadsList').querySelectorAll('.lead-item').forEach(e => e.remove());
+        $('leadsEmpty').style.display = 'block';
+        $('leadsCountBadge').textContent = '0 enviados';
+    });
+
+    /* ── SIDEBAR TOGGLE ── */
+    const sidebar = $('sidebar');
+    const overlay = $('sidebarOverlay');
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+        document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+    }
+    $('btnHamburger').addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+
+    /* ── NAV LINKS ── */
+    document.querySelectorAll('.nav-link[data-view]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            if (window.innerWidth <= 768) toggleSidebar();
+        });
+    });
+
+    /* ── LEAD FORM ── */
+    $('leadForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const empresa = $('l_empresa').value.trim();
+        const contacto = $('l_contacto').value.trim();
+        const telefono = $('l_telefono').value.trim();
+        const notas = $('l_notas').value.trim();
+
+        if (!empresa || !contacto || !telefono) {
+            toast('Por favor completa los campos obligatorios.', 'default');
+            return;
+        }
+
+        const btn = $('leadSubmitBtn');
+        btn.textContent = '⏳ Abriendo WhatsApp...';
+        btn.disabled = true;
+
+        let msg = `*NUEVO PROSPECTO REFERIDO — Nexora Alliance*%0A%0A`;
+        msg += `🏢 *Empresa:* ${empresa}%0A`;
+        msg += `👤 *Directivo:* ${contacto}%0A`;
+        msg += `📱 *WhatsApp:* ${telefono}%0A`;
+        if (notas) msg += `📝 *Notas:* ${notas}%0A`;
+        msg += `%0A_Solicito iniciar el protocolo de auditoría. Estaré atento a las actualizaciones por correo._`;
+
+        const numero = "527298312690";
+        window.open(`https://api.whatsapp.com/send?phone=${numero}&text=${msg}`, '_blank');
+
+        leads.push({ empresa, contacto, telefono, time: getTime() });
+        renderLeads();
+        toast('✅ Prospecto registrado con éxito.', 'success');
+
+        this.reset();
+        setTimeout(() => {
+            btn.textContent = '📲 Enviar a Nexora por WhatsApp';
+            btn.disabled = false;
+        }, 1500);
+    });
+
+    /* ── CALCULADORA ── */
+    $('calcInput').addEventListener('input', function() {
+        const val = parseFloat(this.value);
+        const result = $('calcResult');
+        const breakdown = $('calcBreakdown');
+
+        if (!isNaN(val) && val > 0) {
+            const comision = val * 0.10;
+            $('calcOutput').textContent = fmt(comision);
+            $('calcProj').textContent = fmt(val);
+            $('calcComm').textContent = fmt(comision);
+            result.style.background = 'var(--success-bg)';
+            breakdown.style.display = 'flex';
+        } else {
+            $('calcOutput').textContent = '$0.00';
+            result.style.background = 'var(--success-bg)';
+            breakdown.style.display = 'none';
+        }
+    });
+
+    /* ── SCRIPT GENERATOR ── */
+    const scriptBox = $('scriptBox');
+    let currentScriptType = null;
+
+    function updateCharCount() {
+        const text = scriptBox.value;
+        $('charCount').textContent = `${text.length} caracteres`;
+        $('wordCount').textContent = `${text.trim() ? text.trim().split(/\s+/).length : 0} palabras`;
+    }
+
+    function generarScript(tipo) {
+        const nombre = $('scriptName').value.trim() || '[Nombre]';
+        currentScriptType = tipo;
+
+        let texto = '';
+        if (tipo === 'wa') {
+            texto = `Qué tal ${nombre}, espero que estés excelente. 👋\n\nOye, he estado viendo el crecimiento de tu empresa y me acordé de ti. Actualmente colaboro con Nexora Technology; automatizamos procesos manuales para empresas que escalan rápido pero se ahogan en administración (Excel, WhatsApp, hojas de cálculo).\n\nTengo cupos para regalarles una Auditoría Operativa sin costo para analizar dónde se pierde tiempo y dinero. ¿Te late si te agendo una sesión rápida de 20 min con el Director Técnico? 🚀`;
+        } else {
+            texto = `Hola ${nombre},\n\nMe permito contactarte porque desde Nexora Alliance estamos identificando empresas en tu sector que enfrentan cuellos de botella operativos por procesos manuales.\n\nNuestra firma migra operaciones hacia infraestructuras tecnológicas centralizadas e inteligentes. Actualmente ofrecemos una Auditoría Operativa de 20 minutos sin costo para directivos con visión de escalabilidad.\n\n¿Tendrías disponibilidad esta semana para una revisión breve de tus procesos?\n\nQuedo atento a tu respuesta.`;
+        }
+
+        scriptBox.value = texto;
+        updateCharCount();
+
+        $('btnScriptWA').className = tipo === 'wa' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+        $('btnScriptLI').className = tipo === 'li' ? 'btn btn-primary btn-sm' : 'btn btn-secondary btn-sm';
+    }
+
+    $('btnScriptWA').addEventListener('click', () => generarScript('wa'));
+    $('btnScriptLI').addEventListener('click', () => generarScript('li'));
+
+    $('btnCopyScript').addEventListener('click', () => {
+        if (!scriptBox.value.trim()) { toast('Primero genera un mensaje.'); return; }
+        navigator.clipboard.writeText(scriptBox.value).catch(() => {
+            scriptBox.select();
+            document.execCommand('copy');
+        });
+        const btn = $('btnCopyScript');
+        btn.textContent = '✅ ¡Copiado!';
+        btn.className = 'btn btn-success copy-btn';
+        toast('Mensaje copiado al portapapeles.', 'success');
+        setTimeout(() => {
+            btn.textContent = '📋 Copiar Mensaje';
+            btn.className = 'btn btn-secondary copy-btn';
+        }, 2200);
+    });
+
+    $('btnWhatsappScript').addEventListener('click', () => {
+        if (!scriptBox.value.trim()) { toast('Primero genera un mensaje.'); return; }
+        const encoded = encodeURIComponent(scriptBox.value);
+        window.open(`https://wa.me/?text=${encoded}`, '_blank');
+    });
+
+    /* ── ENTER TO GENERATE ── */
+    $('scriptName').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            generarScript('wa');
+        }
+    });
+
+})();
+</script>
+</body>
+</html>

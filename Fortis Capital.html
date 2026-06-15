@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Norvex Capital | Banca Privada y Gestión de Activos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    
+    <style>
+        :root {
+            /* Colores App Bancaria */
+            --bg-app: #F8FAFC;
+            --bg-white: #FFFFFF;
+            --primary: #0F172A;     /* Navy Oscuro */
+            --blue-brand: #2563EB;  /* Azul Norvex */
+            --blue-light: #EFF6FF;  /* Azul Cielo Fondo */
+            --accent-gold: #B59410;
+            --success: #10B981;
+            --text-main: #1E293B;
+            --text-muted: #64748B;
+            --border-light: #E2E8F0;
+            --shadow-card: 0 10px 25px rgba(15, 23, 42, 0.04);
+            --shadow-float: 0 20px 40px rgba(37, 99, 235, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+        html { scroll-behavior: smooth; background: var(--bg-app); }
+        body { color: var(--text-main); line-height: 1.6; overflow-x: hidden; }
+        h1, h2, h3, .serif { font-family: 'Playfair Display', serif; }
+
+        /* =========================================================
+           NAVEGACIÓN Y LANDING PAGE (PÚBLICA)
+           ========================================================= */
+        nav { background: rgba(255, 255, 255, 0.95); height: 75px; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border-light); backdrop-filter: blur(12px); }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 800; color: var(--primary); text-decoration: none; letter-spacing: -0.5px; }
+        .logo span { color: var(--blue-brand); }
+        .nav-links { display: flex; gap: 2rem; align-items: center; }
+        .nav-links a.link-item { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; transition: 0.2s; }
+        .nav-links a.link-item:hover { color: var(--blue-brand); }
+        .btn-nav-outline { border: 1.5px solid var(--border-light); color: var(--primary); background: transparent; padding: 10px 20px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; }
+        .btn-nav-outline:hover { border-color: var(--primary); }
+        .btn-nav-solid { background: var(--primary); color: #fff; padding: 10px 22px; border-radius: 50px; border: none; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; }
+        .btn-nav-solid:hover { background: var(--blue-brand); transform: translateY(-2px); box-shadow: var(--shadow-float); }
+
+        .hero { padding: 140px 5% 100px; text-align: center; background: radial-gradient(100% 100% at 50% 0%, var(--blue-light) 0%, var(--bg-app) 100%); }
+        .hero-pill { background: #fff; border: 1px solid var(--border-light); color: var(--blue-brand); padding: 6px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; display: inline-block; margin-bottom: 25px; box-shadow: var(--shadow-card); }
+        .hero h1 { font-size: clamp(2.8rem, 7vw, 4.5rem); line-height: 1.1; margin-bottom: 20px; color: var(--primary); letter-spacing: -1px; }
+        .hero p { max-width: 650px; margin: 0 auto 40px; font-size: 1.1rem; color: var(--text-muted); }
+
+        .stats-bar { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; max-width: 1000px; margin: 0 auto 80px; padding: 30px; background: #fff; border-radius: 24px; border: 1px solid var(--border-light); box-shadow: var(--shadow-card); }
+        .stat-box { text-align: center; flex: 1; min-width: 150px; }
+        .stat-box h3 { font-family: 'Inter'; font-size: 2.2rem; font-weight: 800; color: var(--primary); }
+        .stat-box p { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; }
+
+        .section { padding: 80px 5%; max-width: 1400px; margin: 0 auto; }
+        .section-title { font-size: clamp(2rem, 5vw, 2.8rem); text-align: center; margin-bottom: 50px; color: var(--primary); }
+
+        .grid-assets { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .card-asset { background: var(--bg-white); border: 1px solid var(--border-light); border-radius: 24px; padding: 30px; transition: 0.3s; box-shadow: var(--shadow-card); }
+        .card-asset:hover { border-color: var(--blue-brand); transform: translateY(-5px); }
+        .badge { font-size: 0.65rem; font-weight: 800; padding: 6px 12px; border-radius: 8px; display: inline-block; margin-bottom: 15px; text-transform: uppercase; }
+        .badge-priv { background: #ECFDF5; color: var(--success); }
+        .badge-burs { background: #FEF2F2; color: #EF4444; }
+
+        #chart-viewport { display: none; margin: 40px 0; padding: 25px; background: var(--bg-white); border-radius: 24px; border: 1px solid var(--blue-brand); scroll-margin-top: 100px; box-shadow: var(--shadow-float); }
+        .chart-ctrl { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+        .banner-corp { background: var(--primary); color: #fff; padding: 60px 5%; border-radius: 30px; text-align: center; margin: 80px 5%; box-shadow: var(--shadow-float); }
+
+        footer { background: #0B1120; color: #fff; padding: 80px 5% 40px; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 50px; max-width: 1400px; margin: 0 auto; }
+        .footer-col a { display: block; color: #94A3B8; text-decoration: none; margin-bottom: 15px; font-size: 0.9rem; transition: 0.2s; }
+        .footer-col a:hover { color: #fff; }
+
+        /* =========================================================
+           NORVEX APP BANCARIA (OVERLAY)
+           ========================================================= */
+        #norvexApp { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-app); z-index: 5000; overflow: hidden; }
+        .app-shell { display: flex; height: 100%; width: 100%; }
+        
+        /* Barra de Navegación App */
+        .app-nav { width: 260px; background: var(--bg-white); border-right: 1px solid var(--border-light); padding: 30px 15px; display: flex; flex-direction: column; z-index: 10; }
+        .app-nav .logo { padding: 0 15px; margin-bottom: 40px; font-size: 1.4rem; }
+        .menu-item { padding: 14px 15px; border-radius: 12px; cursor: pointer; margin-bottom: 5px; color: var(--text-muted); font-weight: 600; display: flex; align-items: center; gap: 15px; transition: 0.2s; font-size: 0.95rem; }
+        .menu-item:hover { background: var(--bg-app); color: var(--primary); }
+        .menu-item.active { background: var(--primary); color: #fff; }
+
+        /* Área Principal de la App */
+        .app-view { flex-grow: 1; padding: 40px 5%; overflow-y: auto; position: relative; background: var(--bg-app); }
+        
+        /* Tarjeta de Balance (Estilo Tarjeta de Crédito/Wallet) */
+        .wallet-card { background: linear-gradient(135deg, var(--primary) 0%, #1E293B 100%); color: #fff; padding: 40px; border-radius: 28px; margin-bottom: 30px; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2); }
+        .wallet-card::before { content: ''; position: absolute; top: -50%; right: -10%; width: 300px; height: 300px; background: var(--blue-brand); filter: blur(70px); opacity: 0.4; border-radius: 50%; }
+        .w-label { font-size: 0.75rem; color: #94A3B8; font-weight: 700; letter-spacing: 1px; }
+        .w-balance { font-size: clamp(3rem, 6vw, 4.2rem); font-family: 'Playfair Display'; margin: 5px 0; line-height: 1; }
+        
+        /* Acciones Rápidas (Iconos Circulares) */
+        .quick-actions { display: flex; gap: 20px; margin-bottom: 40px; justify-content: flex-start; }
+        .q-action { display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
+        .q-circle { width: 65px; height: 65px; background: var(--bg-white); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; border: 1px solid var(--border-light); box-shadow: var(--shadow-card); transition: 0.3s; }
+        .q-action:hover .q-circle { transform: translateY(-3px); border-color: var(--blue-brand); color: var(--blue-brand); }
+        .q-text { font-size: 0.8rem; font-weight: 600; color: var(--text-main); }
+
+        /* Formularios y Cajas App */
+        .app-box { background: var(--bg-white); padding: 35px; border-radius: 24px; border: 1px solid var(--border-light); box-shadow: var(--shadow-card); max-width: 600px; margin-bottom: 30px; }
+        .form-row { margin-bottom: 20px; }
+        .form-row label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        .app-input { width: 100%; padding: 16px; border: 1px solid var(--border-light); border-radius: 12px; font-size: 1rem; color: var(--primary); background: var(--bg-app); transition: 0.3s; font-family: 'Inter'; }
+        .app-input:focus { border-color: var(--blue-brand); outline: none; background: var(--bg-white); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08); }
+        .btn-submit { width: 100%; padding: 18px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-submit:hover { background: var(--blue-brand); }
+
+        /* Detalles de Transferencia */
+        .transfer-data { background: var(--bg-app); padding: 20px; border-radius: 16px; border: 1px dashed var(--blue-light); margin: 20px 0; }
+        .t-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-light); }
+        .t-row:last-child { border-bottom: none; }
+        .t-row span.val { font-weight: 700; color: var(--primary); }
+
+        /* Manejo de Vistas */
+        .view-pane { display: none; animation: fadeUp 0.4s ease; max-width: 800px; margin: 0 auto; }
+        .view-pane.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- RESPONSIVIDAD --- */
+        @media (max-width: 900px) {
+            nav { padding: 0 20px; height: 70px; }
+            .nav-links a.link-item { display: none; }
+            .hero { padding: 120px 20px 60px; }
+            .stats-bar { gap: 20px; padding: 20px; }
+            .banner-corp { padding: 40px 20px; }
+            
+            /* Bottom Navigation Móvil (Super App Style) */
+            .app-shell { flex-direction: column-reverse; }
+            .app-nav { 
+                width: 100%; height: 80px; flex-direction: row; padding: 5px 10px; 
+                position: fixed; bottom: 0; border-right: none; border-top: 1px solid var(--border-light); 
+                background: rgba(255, 255, 255, 0.98); 
+                overflow-x: auto; white-space: nowrap; gap: 5px;
+                -ms-overflow-style: none; scrollbar-width: none;
+            }
+            .app-nav::-webkit-scrollbar { display: none; }
+            .app-nav .logo { display: none; }
+            
+            .menu-item { flex-direction: column; gap: 4px; padding: 8px; font-size: 0.65rem; text-align: center; margin: 0; border-radius: 12px; min-width: 70px; flex: 1; background: transparent !important; color: var(--text-muted); }
+            .menu-item .icon { font-size: 1.4rem; }
+            .menu-item.active { color: var(--blue-brand) !important; font-weight: 700; }
+            .menu-item.active .icon { transform: scale(1.1); transition: 0.2s; }
+            
+            .app-view { padding: 20px 20px 100px; } /* 100px padding inferior para que no tape el contenido el menú */
+            .wallet-card { padding: 30px 20px; }
+            .app-box { padding: 25px 20px; }
+            .quick-actions { justify-content: space-between; }
+            .q-circle { width: 55px; height: 55px; font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="#" class="logo">NORVEX<span>.</span></a>
+    <div class="nav-links">
+        <a href="#ecosistema" class="link-item">Portafolio</a>
+        <a href="#credito" class="link-item">Crédito Pyme</a>
+        <button class="btn-nav-outline" onclick="openApp('register')">Registrarse</button>
+        <button class="btn-nav-solid" onclick="openApp('dashboard')">Mi Cartera</button>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-pill">INFRAESTRUCTURA DE BANCA PRIVADA</div>
+    <h1>El Capital en su<br><span>Máxima Expresión.</span></h1>
+    <p>Gestionamos patrimonios vinculándolos a los activos más rentables y seguros de la economía global. Fondea tu cuenta y deja que nuestros expertos operen por ti.</p>
+    <div style="display:flex; gap:15px; justify-content:center; flex-wrap:wrap;">
+        <button class="btn-nav-solid" style="padding:18px 40px; font-size:1rem;" onclick="openApp('register')">Apertura de Cuenta</button>
+        <button class="btn-nav-outline" style="padding:18px 40px; font-size:1rem;" onclick="location.href='#ecosistema'">Ver Activos</button>
+    </div>
+</section>
+
+<div class="stats-bar">
+    <div class="stat-box"><h3>$37.2M</h3><p>Capital Operativo</p></div>
+    <div class="stat-box"><h3>18.4%</h3><p>TIR Histórica Anual</p></div>
+    <div class="stat-box"><h3>8</h3><p>Activos Estratégicos</p></div>
+    <div class="stat-box"><h3>100%</h3><p>Transparencia</p></div>
+</div>
+
+<section class="section" id="ecosistema">
+    <h2 class="section-title">Ecosistema de Inversión</h2>
+    
+    <div id="chart-viewport">
+        <div class="chart-ctrl">
+            <h3 id="chart-name" style="color:var(--primary); font-size:1.4rem;">Análisis de Activo</h3>
+            <button onclick="closeChart()" style="background:none; border:none; cursor:pointer; font-size:1.5rem; color:var(--text-muted);">✕</button>
+        </div>
+        <div id="chart-box" style="height: 400px; width:100%;"></div>
+    </div>
+
+    <div class="grid-assets" id="assetGrid">
+        </div>
+</section>
+
+<div class="banner-corp" id="credito">
+    <h2 style="font-size:clamp(2rem, 4vw, 3rem); margin-bottom:15px; font-family:'Playfair Display';">Financiamiento Corporativo</h2>
+    <p style="color:#CBD5E1; margin-bottom:30px; font-size:1.1rem;">Líneas de crédito institucional para empresas B2B, despachos y proyectos de expansión operativa.</p>
+    <button class="btn-nav-solid" style="background:#fff; color:var(--primary); padding:16px 40px; font-size:1rem;" onclick="openApp('corp')">Solicitar Línea de Crédito</button>
+</div>
+
+<footer>
+    <div class="footer-grid">
+        <div>
+            <h3 class="logo" style="color:#fff;">NORVEX<span>.</span></h3>
+            <p style="margin-top: 15px; font-size: 0.9rem; color:var(--text-muted);">Tecnología y gestión inteligente para grandes patrimonios.</p>
+        </div>
+        <div class="footer-col">
+            <h4 style="color:var(--blue-light); margin-bottom:15px; font-size:0.8rem; letter-spacing:1px;">Portafolio</h4>
+            <a href="#ecosistema">Fondo Maestro Norvex</a>
+            <a href="#ecosistema">Agro Simentan</a>
+            <a href="#ecosistema">Nexora Technology</a>
+        </div>
+        <div class="footer-col">
+            <h4 style="color:var(--blue-light); margin-bottom:15px; font-size:0.8rem; letter-spacing:1px;">Institución</h4>
+            <a href="javascript:void(0)" onclick="openApp('corp')">Crédito Empresarial</a>
+            <a href="javascript:void(0)">Aviso de Privacidad</a>
+            <a href="javascript:void(0)">Marco Legal</a>
+        </div>
+    </div>
+    <div style="text-align:center; margin-top:60px; padding-top:20px; border-top:1px solid #1E293B; color:#475569; font-size:0.8rem;">
+        © 2026 Norvex Capital S.A.P.I. de C.V. Todos los derechos reservados.
+    </div>
+</footer>
+
+<div id="norvexApp">
+    <div class="app-shell">
+        
+        <aside class="app-nav">
+            <div class="logo">NORVEX<span>.</span></div>
+            
+            <div class="menu-item" id="nav-dashboard" onclick="switchApp('dashboard')">
+                <span class="icon">🏠</span><span class="text">Inicio</span>
+            </div>
+            <div class="menu-item" id="nav-transfer" onclick="switchApp('transfer')">
+                <span class="icon">💸</span><span class="text">Transferir</span>
+            </div>
+            <div class="menu-item" id="nav-invest" onclick="switchApp('invest')">
+                <span class="icon">📈</span><span class="text">Invertir</span>
+            </div>
+            <div class="menu-item" id="nav-corp" onclick="switchApp('corp')">
+                <span class="icon">🏢</span><span class="text">Empresas</span>
+            </div>
+            
+            <div class="menu-item" onclick="closeApp()" style="margin-top:auto; color:#EF4444;">
+                <span class="icon">✕</span><span class="text">Cerrar</span>
+            </div>
+        </aside>
+
+        <main class="app-view">
+            
+            <div id="v-register" class="view-pane">
+                <h2 style="margin-bottom:10px; color:var(--primary);">Crear Cuenta de Fondo</h2>
+                <p style="color:var(--text-muted); margin-bottom:30px;">Crea tu expediente y obtén tu ID institucional al instante.</p>
+                <div class="app-box">
+                    <form action="https://formspree.io/f/xaqajdqg" method="POST">
+                        <input type="hidden" name="Solicitud" value="Apertura Norvex">
+                        <div class="form-row"><label>Nombre Completo</label><input type="text" name="Nombre" class="app-input" required></div>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                            <div class="form-row" style="flex:1; min-width:100px;"><label>Edad</label><input type="number" name="Edad" class="app-input" required></div>
+                            <div class="form-row" style="flex:2; min-width:150px;"><label>Teléfono Celular</label><input type="tel" name="Tel" class="app-input" required></div>
+                        </div>
+                        <div class="form-row"><label>Correo Electrónico</label><input type="email" name="Email" class="app-input" required></div>
+                        <button type="submit" class="btn-submit">Generar Expediente</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="v-dashboard" class="view-pane">
+                <p style="font-weight:600; color:var(--text-muted); margin-bottom:5px;">Hola, <span id="userNameSim">Inversionista</span></p>
+                <h2 style="margin-bottom:20px; color:var(--primary);">Tu Cartera</h2>
+                
+                <div class="wallet-card">
+                    <div class="w-label">SALDO DISPONIBLE EN FONDO</div>
+                    <div class="w-balance" id="walletBalance">$0.00</div>
+                    <p style="font-size:0.9rem; color:var(--blue-light);">Capital protegido y operando.</p>
+                </div>
+
+                <div class="quick-actions">
+                    <div class="q-action" onclick="switchApp('transfer')">
+                        <div class="q-circle">⬇️</div><span class="q-text">Ingresar</span>
+                    </div>
+                    <div class="q-action" onclick="switchApp('transfer')">
+                        <div class="q-circle">📤</div><span class="q-text">Retirar</span>
+                    </div>
+                    <div class="q-action" onclick="switchApp('invest')">
+                        <div class="q-circle">📈</div><span class="q-text">Invertir</span>
+                    </div>
+                </div>
+
+                <div class="app-box">
+                    <h3 style="margin-bottom:5px; font-size:1.2rem; color:var(--primary);">Estado de Cuenta</h3>
+                    <p style="color:var(--text-muted); font-size:0.85rem; margin-bottom:20px;">Por seguridad, enviaremos el reporte PDF a tu correo.</p>
+                    <form action="https://formspree.io/f/xaqajdqg" method="POST">
+                        <input type="hidden" name="Solicitud" value="Estado de Cuenta App">
+                        <div class="form-row"><label>TU ID DE SOCIO</label><input type="text" name="ID" class="app-input" placeholder="Ej: NVX-1234" required></div>
+                        <div class="form-row"><label>CORREO REGISTRADO</label><input type="email" name="Email" class="app-input" required></div>
+                        <button type="submit" class="btn-submit">Solicitar Reporte</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="v-transfer" class="view-pane">
+                <h2 style="margin-bottom:10px; color:var(--primary);">Operaciones SPEI</h2>
+                <p style="color:var(--text-muted); margin-bottom:30px;">Fondea tu cuenta o solicita liquidez a tu banco.</p>
+                
+                <div class="app-box" style="border-color:var(--success);">
+                    <h3 style="margin-bottom:15px; color:var(--success); font-family:'Inter';">⬇️ Ingresar Capital</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Transfiere a tu CLABE Institucional:</p>
+                    <div class="transfer-data">
+                        <div class="t-row"><small>Banco Custodio</small><span class="val">STP / ALIADO NORVEX</span></div>
+                        <div class="t-row"><small>CLABE</small><span class="val" style="letter-spacing:1px;">0123 4567 8901 2345 67</span></div>
+                        <div class="t-row"><small>Beneficiario</small><span class="val">Norvex S.A.P.I.</span></div>
+                        <div class="t-row" style="border:none;"><small>Concepto de Pago</small><span class="val" style="color:var(--blue-brand);">TU ID DE SOCIO</span></div>
+                    </div>
+                    <p style="font-size:0.75rem; color:#B45309; background:#FEF3C7; padding:10px; border-radius:8px;">⚠️ Obligatorio poner tu ID en el concepto para acreditar el saldo.</p>
+                </div>
+
+                <div class="app-box">
+                    <h3 style="margin-bottom:15px; color:var(--primary); font-family:'Inter';">📤 Retirar Capital</h3>
+                    <form action="https://formspree.io/f/xaqajdqg" method="POST">
+                        <input type="hidden" name="Solicitud" value="Retiro SPEI App">
+                        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                            <div class="form-row" style="flex:1; min-width:120px;"><label>ID SOCIO</label><input type="text" name="ID_Socio" class="app-input" required></div>
+                            <div class="form-row" style="flex:1; min-width:150px;"><label>MONTO (MXN)</label><input type="number" name="Monto" class="app-input" required></div>
+                        </div>
+                        <div class="form-row"><label>BANCO DESTINO (TU CUENTA)</label><input type="text" name="Banco_Destino" class="app-input" placeholder="Ej: BBVA" required></div>
+                        <div class="form-row"><label>CLABE DESTINO (18 Dígitos)</label><input type="text" name="CLABE_Destino" class="app-input" required></div>
+                        <button type="submit" class="btn-submit">Solicitar Retiro</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="v-invest" class="view-pane">
+                <h2 style="margin-bottom:10px; color:var(--primary);">Inversiones</h2>
+                <p style="color:var(--text-muted); margin-bottom:30px;">Asigna tu saldo disponible al Fondo Maestro o a empresas individuales.</p>
+                
+                <div class="app-box" style="background:var(--primary); color:#fff; border:none; margin-bottom:20px;">
+                    <h3 style="color:#fff; margin-bottom:10px;">Fondo Maestro Norvex</h3>
+                    <p style="font-size:0.9rem; color:#cbd5e1; margin-bottom:15px;">Gestión automática y diversificada por nuestros expertos en activos reales y bursátiles.</p>
+                    <div style="background:rgba(255,255,255,0.1); padding:15px; border-radius:12px; display:inline-block; margin-bottom:20px;">
+                        <span style="font-size:0.8rem; display:block; color:var(--blue-light);">RENDIMIENTO OBJETIVO</span>
+                        <span style="font-size:1.8rem; font-weight:800; color:var(--accent-gold);">10% Mensual</span>
+                    </div>
+                    <button class="btn-submit" style="background:#fff; color:var(--primary);" onclick="document.getElementById('selectInv').value = 'Fondo Maestro Norvex (10% Mensual)'; window.scrollTo(0,document.body.scrollHeight);">Seleccionar Fondo</button>
+                </div>
+
+                <div class="app-box" style="border-color:var(--blue-brand);">
+                    <form action="https://formspree.io/f/xaqajdqg" method="POST">
+                        <input type="hidden" name="Solicitud" value="Asignación de Capital App">
+                        <div class="form-row"><label>TU ID DE SOCIO</label><input type="text" name="ID" class="app-input" required></div>
+                        <div class="form-row">
+                            <label>SELECCIONA EL DESTINO</label>
+                            <select name="Destino" class="app-input" id="selectInv">
+                                <option value="Fondo Maestro Norvex (10% Mensual)">Fondo Maestro Norvex (Recomendado)</option>
+                                </select>
+                        </div>
+                        <div class="form-row"><label>MONTO A INVERTIR (MXN)</label><input type="number" name="Monto" class="app-input" required></div>
+                        <button type="submit" class="btn-submit">Confirmar Inversión</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="v-corp" class="view-pane">
+                <h2 style="margin-bottom:10px; color:var(--primary);">Servicios Corporativos</h2>
+                <p style="color:var(--text-muted); margin-bottom:30px;">Soluciones de financiamiento e información legal del fondo.</p>
+                
+                <div class="app-box" style="border-color:var(--accent-gold);">
+                    <h3 style="margin-bottom:20px; color:var(--accent-gold);">Solicitud de Crédito Pyme</h3>
+                    <form action="https://formspree.io/f/xaqajdqg" method="POST">
+                        <input type="hidden" name="Solicitud" value="Crédito Corporativo (Desde App)">
+                        <div class="form-row"><label>RAZÓN SOCIAL</label><input type="text" name="Empresa" class="app-input" required></div>
+                        <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                            <div class="form-row" style="flex:1; min-width:140px;"><label>RFC</label><input type="text" name="RFC" class="app-input" required></div>
+                            <div class="form-row" style="flex:1; min-width:140px;"><label>MONTO (MXN)</label><input type="number" name="Monto" class="app-input" required></div>
+                        </div>
+                        <div class="form-row"><label>DESTINO (BREVE)</label><input type="text" name="Uso" class="app-input" required></div>
+                        <button type="submit" class="btn-submit" style="background:var(--accent-gold); color:var(--primary);">Enviar a Comité Evaluador</button>
+                    </form>
+                </div>
+
+                <div class="app-box">
+                    <h3 style="margin-bottom:15px; color:var(--blue-brand); font-size:1.1rem;">Aviso Legal e Institucional</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">Norvex Capital opera como S.A.P.I. de C.V. Todo capital está resguardado bajo estricto cumplimiento normativo y respaldado por contratos de fideicomiso privado o deuda convertible sobre los activos de la empresa elegida.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    // --- LÓGICA NAVEGACIÓN APP BANCARIA ---
+    function openApp(view) { 
+        document.getElementById('norvexApp').style.display='block'; 
+        document.body.style.overflow='hidden'; 
+        
+        // Simulación especial para Cristian (Regla Maestra aplicada sutilmente)
+        if(view === 'dashboard' || view === 'wallet') {
+            document.getElementById('userNameSim').innerText = "Cristian Guadalupe Puente Mendoza";
+            document.getElementById('walletBalance').innerText = "$5,240,357.91";
+            view = 'dashboard';
+        }
+        
+        switchApp(view); 
+    }
+    
+    function closeApp() { 
+        document.getElementById('norvexApp').style.display='none'; 
+        document.body.style.overflow='auto'; 
+    }
+
+    function switchApp(id) {
+        // Limpiar activas
+        document.querySelectorAll('.view-pane').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        
+        // Activar solicitada
+        const viewEl = document.getElementById('v-' + id);
+        const navEl = document.getElementById('nav-' + id);
+        
+        if(viewEl) viewEl.classList.add('active');
+        if(navEl) navEl.classList.add('active');
+        
+        // Scrollear arriba dentro de la app
+        document.querySelector('.app-view').scrollTop = 0;
+    }
+
+    // --- BASE DE DATOS (EMPRESAS PÚBLICAS) ---
+    const ASSETS = [
+        { name: "Agro Simentan", cat: "Capital Privado", tir: "Variable", val: "$2.15", isB: false, data: [1, 1.7, 2.15] },
+        { name: "Nexora Technology", cat: "Capital Privado", tir: "Variable", val: "$0.32", isB: false, data: [0.1, 0.22, 0.32] },
+        { name: "Coca-Cola Co.", cat: "Acción Bursátil", tir: "Mercado", val: "NYSE: KO", isB: true, ticker: "NYSE:KO" },
+        { name: "Apple Inc.", cat: "Acción Bursátil", tir: "Mercado", val: "NASDAQ: AAPL", isB: true, ticker: "NASDAQ:AAPL" },
+        { name: "FedEx Corp", cat: "Acción Bursátil", tir: "Mercado", val: "NYSE: FDX", isB: true, ticker: "NYSE:FDX" },
+        { name: "Volt Energy", cat: "Capital Privado", tir: "Variable", val: "$5.10", isB: false, data: [3, 4.2, 5.10] }
+    ];
+
+    function init() {
+        const grid = document.getElementById('assetGrid');
+        const selectInv = document.getElementById('selectInv');
+
+        ASSETS.forEach((a, i) => {
+            // Llenar Tarjetas Web
+            grid.innerHTML += `
+                <div class="card-asset">
+                    <span class="badge ${a.isB ? 'badge-burs' : 'badge-priv'}">${a.cat}</span>
+                    <h3 style="font-size:1.3rem; margin-bottom:15px; color:var(--primary);">${a.name}</h3>
+                    <div class="card-val">
+                        <div><small style="display:block; font-size:0.65rem; color:var(--text-muted); font-weight:700;">TIR</small><span class="val-num" style="color:var(--text-main);">${a.tir}</span></div>
+                        <div style="text-align:right;"><small style="display:block; font-size:0.65rem; color:var(--text-muted); font-weight:700;">VALOR TÍTULO</small><span class="val-num">${a.val}</span></div>
+                    </div>
+                    <button class="btn-nav-outline" style="width:100%; margin-top:20px;" onclick="showChart(${i})">Análisis de Gráfica</button>
+                </div>
+            `;
+            
+            // Llenar Selectores en Inversión
+            if(selectInv) {
+                selectInv.innerHTML += `<option value="${a.name}">${a.name} (Gestión Independiente)</option>`;
+            }
+        });
+    }
+
+    // --- GRÁFICAS DE DEMOSTRACIÓN ---
+    let chartObj = null;
+    function showChart(index) {
+        const a = ASSETS[index];
+        const view = document.getElementById('chart-viewport');
+        const box = document.getElementById('chart-box');
+        
+        view.style.display = 'block';
+        box.innerHTML = "";
+        document.getElementById('chart-name').innerText = "Análisis: " + a.name;
+
+        if(a.isB) {
+            new TradingView.MediumWidget({ "symbols": [[a.name, a.ticker]], "width": "100%", "height": "100%", "locale": "es", "container_id": "chart-box", "gridLineColor": "#e2e8f0", "fontColor": "#64748B", "underLineColor": "#e0f2fe", "trendLineColor": "#2563EB" });
+        } else {
+            box.innerHTML = '<canvas id="canvasChart"></canvas>';
+            const ctx = document.getElementById('canvasChart').getContext('2d');
+            if(chartObj) chartObj.destroy();
+            chartObj = new Chart(ctx, { 
+                type: 'line', 
+                data: { 
+                    labels: ['Q1', 'Q2', 'Actual'], 
+                    datasets: [{ label: 'Valuación', data: a.data, borderColor: '#2563EB', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.4 }] 
+                }, 
+                options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}} } 
+            });
+        }
+        
+        setTimeout(() => { view.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 150);
+    }
+
+    function closeChart() { document.getElementById('chart-viewport').style.display='none'; }
+
+    // Ejecutar al cargar la página
+    window.onload = init;
+</script>
+
+</body>
+</html>
