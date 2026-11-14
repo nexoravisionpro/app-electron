@@ -1,6 +1,6 @@
 {
   "name": "html-basico",
-  "version": "1.0.2",
+  "version": "1.0.3-crm.1",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -8,7 +8,9 @@
     "dist": "electron-builder --mac",
     "dist:dmg": "electron-builder --mac dmg",
     "dist:zip": "electron-builder --mac zip",
-    "dist:win": "electron-builder --win"
+    "dist:win": "electron-builder --win",
+    "dist:review": "electron-builder --publish never",
+    "check:source": "node scripts/check-package.cjs"
   },
   "keywords": [],
   "author": "Nexora Vision Pro",
@@ -31,7 +33,12 @@
     "mac": {
       "target": [
         "dmg"
-      ]
+      ],
+      "identity": "-",
+      "hardenedRuntime": true,
+      "notarize": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "win": {
       "target": [
@@ -46,6 +53,15 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
+    },
+    "artifactName": "CorePoint-${version}-${os}-${arch}.${ext}",
+    "files": [
+      "main.js",
+      "Facture01.html",
+      "package.json"
+    ],
+    "dmg": {
+      "sign": false
     }
   },
   "dependencies": {

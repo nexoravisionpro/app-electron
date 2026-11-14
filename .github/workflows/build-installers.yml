@@ -1,0 +1,143 @@
+name: CorePoint installers for review
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/build-installers.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: corepoint-installers-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      release_id: ${{ steps.release.outputs.release_id }}
+      release_url: ${{ steps.release.outputs.release_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create draft delivery
+        id: release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const version = JSON.parse(fs.readFileSync('package.json', 'utf8')).version;
+            const tag = `corepoint-${version}-build-${context.runId}`;
+            const {data: releases} = await github.rest.repos.listReleases({...context.repo, per_page: 100});
+            let release = releases.find(item => item.tag_name === tag);
+            if (!release) {
+              ({data: release} = await github.rest.repos.createRelease({
+                ...context.repo, tag_name: tag, target_commitish: context.sha,
+                name: `CorePoint ${version} - instaladores de revisión`,
+                draft: true, prerelease: true,
+                body: `Compilación en curso. Fuente: ${context.sha}. No es una actualización estable.`,
+              }));
+            }
+            core.setOutput('release_id', String(release.id));
+            core.setOutput('release_url', release.html_url);
+            await core.summary.addLink('Instaladores de revisión', release.html_url).write();
+
+  build:
+    needs: prepare
+    name: Build ${{ matrix.platform }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows
+            runner: windows-latest
+            arch: x64
+            command: --win nsis --x64
+          - platform: mac-intel
+            runner: macos-15-intel
+            arch: x64
+            command: --mac dmg --x64
+          - platform: mac-apple-silicon
+            runner: macos-15
+            arch: arm64
+            command: --mac dmg --arm64
+    defaults:
+      run:
+        shell: bash
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Validate integrated source
+        run: npm run check:source
+      - name: Build native installer
+        run: npx electron-builder ${{ matrix.command }} --publish never
+      - name: Verify packaged content and installer
+        run: node scripts/verify-installer.cjs
+      - name: Verify Mac disk image and local signature
+        if: runner.os == 'macOS'
+        run: |
+          hdiutil verify dist/*.dmg
+          codesign --verify --deep --strict dist/mac*/CorePoint.app
+      - name: Start packaged source in native Electron
+        run: npx electron scripts/smoke-electron.cjs
+      - name: Attach verified files to draft
+        uses: actions/github-script@v7
+        env:
+          RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const release_id = Number(process.env.RELEASE_ID);
+            const {data: current} = await github.rest.repos.listReleaseAssets({...context.repo, release_id, per_page: 100});
+            const files = fs.readdirSync('dist').filter(name => /\.(exe|dmg|sha256|json)$/.test(name) && !name.includes('builder-'));
+            for (const name of files) {
+              const old = current.find(asset => asset.name === name);
+              if (old) await github.rest.repos.deleteReleaseAsset({...context.repo, asset_id: old.id});
+              await github.rest.repos.uploadReleaseAsset({
+                ...context.repo, release_id, name,
+                data: fs.readFileSync(path.join('dist', name)),
+                headers: {'content-type': 'application/octet-stream'},
+              });
+            }
+            await core.summary.addHeading('Archivos verificados').addList(files).write();
+
+  finish:
+    if: always() && needs.prepare.result == 'success'
+    needs: [prepare, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+          BUILD_RESULT: ${{ needs.build.result }}
+        with:
+          script: |
+            const release_id = Number(process.env.RELEASE_ID);
+            const {data: assets} = await github.rest.repos.listReleaseAssets({...context.repo, release_id, per_page: 100});
+            const installers = assets.filter(asset => /\.(exe|dmg)$/.test(asset.name));
+            const complete = process.env.BUILD_RESULT === 'success' && installers.length === 3;
+            const body = [
+              complete ? 'Los tres instaladores se generaron y pasaron la verificación de contenido y arranque.' : 'Compilación incompleta. Revisar los trabajos antes de utilizar los archivos disponibles.',
+              '', `Fuente: ${context.sha}`, '',
+              'Windows x64, Mac Intel x64 y Mac Apple Silicon arm64. Se adjuntan sumas SHA-256 y reportes de arranque.',
+              'Sin certificado de editor ni notarización Apple. Mac tiene firma local ad hoc y puede requerir autorización del usuario.',
+              'Versión de revisión: siguen pendientes la validación comercial completa y los cambios del servidor. No se publica como versión estable ni se activa autoactualización.',
+              '', ...installers.map(asset => `- ${asset.name} (${asset.size} bytes)`),
+              '', `Compilación: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+            ].join('\n');
+            await github.rest.repos.updateRelease({...context.repo, release_id, draft: true, prerelease: true, body});
