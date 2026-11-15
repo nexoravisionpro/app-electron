@@ -1,4 +1,5 @@
 name: CorePoint installers for review
+# Incluye acceso seguro a la configuración de Telegram (crm.2).
 
 on:
   workflow_dispatch:

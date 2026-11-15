@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, shell } = require('electron')
 const path = require('node:path')
 
 function createWindow() {
@@ -8,6 +8,13 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true
     }
+  })
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    if (url === 'https://nexora-server-2uub.onrender.com/telegram') {
+      shell.openExternal(url).catch(() => {})
+      return { action: 'deny' }
+    }
+    return { action: 'allow' }
   })
   win.loadFile(path.join(__dirname, 'Facture01.html'))
 }

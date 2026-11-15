@@ -4044,6 +4044,14 @@ nav.topnav { box-shadow: 0 2px 14px rgba(17,31,53,.04); }
       </div>
     </div>
 
+    <div class="config-section" id="telegram-alerts-section">
+      <div class="config-section-header">
+        <div class="config-section-icon blue"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2 9 15M22 2l-8 20-5-7-7-5 20-8Z"/></svg></div>
+        <div style="flex:1"><div class="config-section-title">Alertas al celular · Telegram</div><div class="config-section-sub">Vincula al dueño o gerente y elige avisos de inventario y tareas.</div></div>
+      </div>
+      <div style="padding:0 24px 24px"><p style="font-size:13px;color:var(--text-secondary);line-height:1.6">La configuración se abre en tu navegador. Inicia sesión con la cuenta del negocio, vincula el celular y envía una prueba. Los avisos requieren conexión y pueden retrasarse por disponibilidad del servidor.</p><button type="button" class="btn-primary" id="cp-open-telegram" onclick="if(window.cpRequirePermission &amp;&amp; window.cpRequirePermission('settings'))window.open('https://nexora-server-2uub.onrender.com/telegram','_blank','noopener,noreferrer')">Configurar avisos de Telegram</button></div>
+    </div>
+
     <!-- Manual de usuario -->
     <div class="config-section" id="manual-section">
       <div class="config-section-header" style="cursor:pointer;" onclick="toggleManual()">
