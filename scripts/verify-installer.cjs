@@ -5,6 +5,7 @@ const files=walk(dist),archives=files.filter(p=>p.endsWith(path.join('resources'
 assert.equal(archives.length,1,'Debe existir un solo paquete por plataforma');
 const archive=archives[0],expected=fs.readFileSync(path.join(root,'Facture01.html')),actual=asar.extractFile(archive,'Facture01.html');assert(expected.equals(actual),'El HTML empaquetado debe coincidir con el revisado');
 const pkg=JSON.parse(asar.extractFile(archive,'package.json'));assert.equal(pkg.version,require('../package.json').version);assert(asar.extractFile(archive,'main.js').length>0);
+for(const file of ['preload.cjs','operations.js','operations.css','business-math.js','business-pdf.cjs'])assert(fs.readFileSync(path.join(root,file)).equals(asar.extractFile(archive,file)),'El archivo empaquetado debe coincidir: '+file);
 for(const forbidden of ['api_nexora.php','BancoNuevo.html','Fortis Capital.html'])assert(!asar.listPackage(archive).includes('/'+forbidden),'Archivo ajeno al producto');
 const installers=fs.readdirSync(dist).filter(p=>/\.(exe|dmg)$/.test(p));assert.equal(installers.length,1,'Debe existir un instalador por trabajo');
 const name=installers[0],binary=fs.readFileSync(path.join(dist,name));assert(binary.length>1000000);if(name.endsWith('.exe'))assert.equal(binary.subarray(0,2).toString(),'MZ');

@@ -2418,6 +2418,7 @@ nav.topnav { box-shadow: 0 2px 14px rgba(17,31,53,.04); }
 /* Guardado de editores del CRM */
 .crm-editor :is(input,select,textarea):disabled{opacity:.65;cursor:wait}.crm-editor button:disabled{opacity:.5;cursor:not-allowed}.crm-editor .crm-draft-status{margin-bottom:12px;font-size:10px;line-height:1.8}.crm-editor .crm-draft-status.dirty{color:var(--amber)}
 </style>
+<link rel="stylesheet" href="operations.css">
 </head>
 <body>
 
@@ -10215,6 +10216,7 @@ async function abrirNuevoGasto(id) {
   document.getElementById('gasto-proveedor').value= g?.proveedor  || '';
   document.getElementById('gasto-fecha').value    = g?.fecha      || new Date().toISOString().slice(0,10);
   document.getElementById('gasto-notas').value    = g?.notas      || '';
+  cpFillOpsDetails('expense',g);
   document.getElementById('modal-gasto-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   setTimeout(() => document.getElementById('gasto-desc').focus(), 200);
@@ -10437,6 +10439,7 @@ function abrirNuevaCita(id) {
   document.getElementById('cita-tel').value       = c?.telefono  || '';
   document.getElementById('cita-prioridad').value = c?.prioridad || 'normal';
   document.getElementById('cita-notas').value     = c?.notas     || '';
+  cpFillOpsDetails('appointment',c);
   document.getElementById('modal-cita-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   setTimeout(() => document.getElementById('cita-titulo').focus(), 200);
@@ -10483,9 +10486,11 @@ async function cargarCitas() {
 }
 async function guardarCita() {
   if (window._cpCitaSaving) return;
+  let details;try {details=cpReadOpsDetails('appointment');}catch(e){showToast(e.message,'error');return;}
   const titulo = document.getElementById('cita-titulo').value.trim();
   if (!titulo) { showToast('Agrega un título a la cita', 'error'); return; }
   const payload = {
+    details,
     titulo,
     fecha:     document.getElementById('cita-fecha').value,
     hora:      document.getElementById('cita-hora').value,
@@ -10496,8 +10501,8 @@ async function guardarCita() {
   };
   if (!payload.fecha) { showToast('Selecciona la fecha de la cita', 'error'); return; }
   if (_citasEstado !== 'listo') { showToast('Carga la agenda antes de guardar una cita', 'error'); return; }
-  const conflicto = payload.hora && citasDB.find(c => c.id !== _editCitaId && !c.hecho && c.fecha === payload.fecha && (c.hora || '').slice(0,5) === payload.hora.slice(0,5));
-  if (conflicto && !confirm('Ya existe una cita a esa hora: ' + conflicto.titulo + '. ¿Deseas guardar esta cita de todos modos?')) return;
+  const conflicto = cpAppointmentConflict(payload);
+  if (conflicto && !confirm('Hay un cruce de horario para este responsable: ' + conflicto.titulo + '. ¿Deseas guardar esta cita de todos modos?')) return;
   if (!window._currentUserId) return;
   const citaToken = cpLockCommercialEditor('appointment');
   if (!citaToken) return;
@@ -10505,7 +10510,7 @@ async function guardarCita() {
   try {
   let error, data;
   if (citaId) {
-    ({ error, data } = await window.sb.from('citas').update(payload).eq('id', citaId).select('id').maybeSingle());
+    ({ error, data } = await window.sb.from('citas').update(payload).eq('id', citaId).eq('ops_revision',citasDB.find(c=>c.id===citaId)?.ops_revision??0).select('id').maybeSingle());
     if (!error && !data) throw new Error('La cita ya no está disponible');
   } else if (citaDealId) {
     if (!citaRequestId) throw new Error('Falta la referencia segura de la cita');
@@ -10642,6 +10647,7 @@ function abrirNuevaCotizacion(id) {
   document.getElementById('cot-monto').value    = c?.monto    || '';
   document.getElementById('cot-validez').value  = c?.validez  || '';
   document.getElementById('cot-notas').value    = c?.notas    || '';
+  cpFillOpsDetails('quote',c);
   document.getElementById('modal-cot-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   setTimeout(() => document.getElementById('cot-cliente').focus(), 200);
@@ -10687,6 +10693,7 @@ async function cargarCotizaciones() {
 }
 async function guardarCotizacion() {
   if (window._cpQuoteSaving) return;
+  let details;try {details=cpReadOpsDetails('quote');}catch(e){showToast(e.message,'error');return;}
   const cliente  = document.getElementById('cot-cliente').value.trim();
   const concepto = document.getElementById('cot-concepto').value.trim();
   const monto    = parseFloat(document.getElementById('cot-monto').value);
@@ -10701,6 +10708,7 @@ async function guardarCotizacion() {
   const cotId = _editCotId, cotDealId = window._cpCrmQuoteDealId, cotRequestId = window._cpCrmQuoteRequestId;
   try {
   const payload = {
+    details,
     cliente,
     telefono: document.getElementById('cot-tel').value.trim(),
     concepto,
@@ -10711,7 +10719,7 @@ async function guardarCotizacion() {
   let error, data;
   if (cotId) {
     payload.estado = 'pendiente';
-    let cambio = window.sb.from('cotizaciones').update(payload).eq('id', cotId);
+    let cambio = window.sb.from('cotizaciones').update(payload).eq('id', cotId).eq('ops_revision',anterior.ops_revision??0);
     cambio = anterior.estado == null ? cambio.is('estado', null) : cambio.eq('estado', anterior.estado);
     ({ error, data } = await cambio.select('id').maybeSingle());
     if (!error && !data) throw new Error('La cotización cambió o ya no está disponible');
@@ -10851,6 +10859,7 @@ function renderCotizaciones() {
 // EMPLEADOS
 // ════════════════════════════════════════════════════
 function abrirNuevoEmpleado(id) {
+  if (_empleadoGuardando) return;
   _editEmpId = id || null;
   const e = id ? empleadosDB.find(x => x.id === id) : null;
   document.getElementById('modal-emp-title').textContent = e ? 'Editar empleado' : 'Nuevo empleado';
@@ -10863,6 +10872,7 @@ function abrirNuevoEmpleado(id) {
   document.getElementById('emp-bono').value    = e?.bono    || '';
   document.getElementById('emp-deduccion').value = e?.deduccion || '';
   document.getElementById('emp-deduccion-motivo').value = e?.deduccion_motivo || '';
+  cpFillOpsDetails('employee',e);
   previewNetoEmpleado();
   document.getElementById('modal-emp-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -10917,6 +10927,7 @@ async function cargarEmpleados() {
 async function guardarEmpleado() {
   if (_empleadoGuardando) return;
   if (_empleadosEstado !== 'listo') { showToast('Carga los empleados antes de guardar', 'error'); return; }
+  let details;try { details=cpReadOpsDetails('employee'); } catch(e){showToast(e.message,'error');return;}
   const nombre = document.getElementById('emp-nombre').value.trim();
   if (!nombre) { showToast('Ingresa el nombre del empleado', 'error'); return; }
   for (const campo of ['emp-salario', 'emp-bono', 'emp-deduccion']) {
@@ -10928,6 +10939,7 @@ async function guardarEmpleado() {
     }
   }
   const payload = {
+    details,
     nombre,
     rol:      document.getElementById('emp-rol').value.trim(),
     telefono: document.getElementById('emp-tel').value.trim(),
@@ -10945,7 +10957,7 @@ async function guardarEmpleado() {
   if (boton) boton.disabled = true;
   try {
     let resultado;
-    if (editId) resultado = await window.sb.from('empleados').update(payload).eq('id',editId).select('id').maybeSingle();
+    if (editId) resultado = await window.sb.from('empleados').update(payload).eq('id',editId).eq('ops_revision',empleadosDB.find(e=>e.id===editId)?.ops_revision??0).select('id').maybeSingle();
     else resultado = await window.sb.from('empleados').insert([payload]).select('id').maybeSingle();
     if (resultado.error) throw resultado.error;
     if (!resultado.data) throw new Error('El registro ya no está disponible');
@@ -11221,7 +11233,7 @@ function renderEmpleados() {
   const sortBy  = sortEl?.value || 'reciente';
 
   let filtrados = empleadosDB.filter(e => {
-    if (q && !(`${e.nombre||''} ${e.rol||''}`.toLowerCase().includes(q))) return false;
+    if (q && !(`${e.nombre||''} ${e.rol||''} ${e.details?.department||''} ${e.details?.code||''} ${e.details?.email||''}`.toLowerCase().includes(q))) return false;
     if (fStatus && e.status !== fStatus) return false;
     if (fTurno && e.turno !== fTurno) return false;
     return true;
@@ -18404,4 +18416,6 @@ window.cpResetCRM=function(){
 })();
 
 </script>
+<script src="business-math.js"></script>
+<script src="operations.js"></script>
 </body></html>

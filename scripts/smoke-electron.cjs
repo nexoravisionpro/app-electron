@@ -11,9 +11,11 @@ app.on('browser-window-created',(_,win)=>{
  win.webContents.once('did-finish-load',async()=>{
   try{
    await new Promise(resolve=>setTimeout(resolve,1500));
-   const state=await win.webContents.executeJavaScript(`({telegram:!!document.getElementById('cp-open-telegram'),crm:typeof window.cpLoadCRM==='function',sessionReset:typeof window.cpResetCRM==='function',auth:typeof window.sb?.auth?.signInWithPassword==='function',login:!!document.getElementById('login-overlay'),calls:!!document.getElementById('crm-call-form'),campaigns:!!document.getElementById('crm-campaign-form'),unauthenticated:!window._currentUserId})`);
+   const state=await win.webContents.executeJavaScript(`({telegram:!!document.getElementById('cp-open-telegram'),crm:typeof window.cpLoadCRM==='function',sessionReset:typeof window.cpResetCRM==='function',auth:typeof window.sb?.auth?.signInWithPassword==='function',login:!!document.getElementById('login-overlay'),calls:!!document.getElementById('crm-call-form'),campaigns:!!document.getElementById('crm-campaign-form'),unauthenticated:!window._currentUserId,employeeDetails:!!document.getElementById('ops-emp-code'),quoteItems:!!document.getElementById('ops-cot-lines'),appointmentCalendar:!!document.getElementById('ops-calendar'),expensePayments:!!document.getElementById('ops-gasto-state'),reportFilters:!!document.getElementById('ops-report-from'),pdfBridge:typeof window.cpDocuments?.savePdf==='function'})`);
    if(errors.length||Object.values(state).some(v=>!v))return finish(1,{error:'Falló el arranque del paquete',state,errors});
-   const report={startupPassed:true,state,scope:'Arranque de código empaquetado en Electron, sin iniciar sesión ni operaciones comerciales'};
+   const pdf=await require(path.join(archive,'business-pdf.cjs')).createBusinessPDF({kind:'quote',business:{name:'Prueba de empaquetado'},quote:{id:'QA',cliente:'Cliente de prueba',concepto:'Prueba local sin cobro',monto:116,details:{items:[{description:'Servicio',qty:1,price:100}],discount:0,tax:16}}});
+   if(!pdf.subarray(0,4).equals(Buffer.from('%PDF')))throw Error('El PDF empaquetado no es válido');
+   const report={startupPassed:true,state,pdfGenerated:true,pdfBytes:pdf.length,scope:'Arranque y generación de PDF desde el código empaquetado; sin iniciar sesión ni operaciones comerciales'};
    fs.writeFileSync(path.join(root,'dist','arranque-'+process.platform+'-'+process.arch+'.json'),JSON.stringify(report,null,2));finish(0,report);
   }catch(error){finish(1,{error:String(error)})}
  });

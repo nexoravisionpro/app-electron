@@ -1,5 +1,5 @@
 name: CorePoint installers for review
-# Incluye acceso seguro a la configuración de Telegram (crm.2).
+# Incluye expedientes, partidas/PDF, agenda, pagos y reportes (crm.3).
 
 on:
   workflow_dispatch:

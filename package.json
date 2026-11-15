@@ -1,6 +1,6 @@
 {
   "name": "html-basico",
-  "version": "1.0.3-crm.2",
+  "version": "1.0.3-crm.3",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -58,7 +58,13 @@
     "files": [
       "main.js",
       "Facture01.html",
-      "package.json"
+      "package.json",
+      "preload.cjs",
+      "business-pdf.cjs",
+      "business-math.js",
+      "operations.js",
+      "operations.css",
+      "fonts/*"
     ],
     "dmg": {
       "sign": false
@@ -67,6 +73,7 @@
   "dependencies": {
     "better-sqlite3": "^12.11.1",
     "electron-log": "^5.4.4",
-    "electron-updater": "^6.8.9"
+    "electron-updater": "^6.8.9",
+    "pdfkit": "0.18.0"
   }
 }
