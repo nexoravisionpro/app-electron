@@ -1,0 +1,36 @@
+begin;
+do $$
+declare u uuid;other_user uuid;supplier uuid:=gen_random_uuid();purchase uuid:=gen_random_uuid();account uuid:=gen_random_uuid();case_id uuid:=gen_random_uuid();warehouse uuid:=gen_random_uuid();warehouse2 uuid:=gen_random_uuid();product bigint;req uuid;result jsonb;payload jsonb;payment uuid;stock numeric;
+begin
+ select id into u from auth.users order by created_at limit 1;
+ select id into other_user from auth.users where id<>u limit 1;
+ if u is null or other_user is null then raise exception 'Faltan cuentas para comprobar aislamiento';end if;
+ perform set_config('request.jwt.claim.sub',u::text,true);
+ set local role authenticated;
+ insert into public.almacenes(id,user_id,nombre)values(warehouse,u,'QA rollback recepción'),(warehouse2,u,'QA rollback transferencia');
+ insert into public.productos(user_id,nombre,precio)values(u,'[QA] Producto QA (0 piezas)',20)returning id into product;
+ result:=public.cp_business_manage(gen_random_uuid(),'supplier.save',supplier,jsonb_build_object('name','QA rollback proveedor','expected_user',u));
+ result:=public.cp_business_manage(gen_random_uuid(),'purchase.save',purchase,jsonb_build_object('expected_user',u,'supplier_id',supplier,'warehouse_id',warehouse,'reference','QA rollback compra','tax',16,'items',jsonb_build_array(jsonb_build_object('product_id',product,'description','Producto QA','quantity',2,'unit_cost',10))));
+ result:=public.cp_business_manage(gen_random_uuid(),'purchase.order',purchase,jsonb_build_object('expected_user',u,'revision',0));
+ payload:=jsonb_build_object('expected_user',u,'revision',1,'adjustments',jsonb_build_array(jsonb_build_object('product_id',product,'expected_name','[QA] Producto QA (0 piezas)','expected_stock','{}'::jsonb,'new_name','[QA] Producto QA (2 piezas) {costo:10.00}')));
+ req:=gen_random_uuid();result:=public.cp_business_manage(req,'purchase.receive',purchase,payload);result:=public.cp_business_manage(req,'purchase.receive',purchase,payload);
+ select cantidad into stock from public.producto_existencias where producto_id=product and almacen_id=warehouse;
+ if stock<>2 or (select count(*)from public.kardex where producto_id=product and documento_tipo='compra')<>1 then raise exception 'Recepción inconsistente o duplicada';end if;
+ result:=public.cp_business_manage(gen_random_uuid(),'account.create',account,jsonb_build_object('expected_user',u,'kind','pagar','party','QA proveedor','concept','Compra QA','purchase_id',purchase,'amount',23.20,'due_on',current_date));
+ payload:=jsonb_build_object('expected_user',u,'amount',5,'paid_on',current_date,'method','Transferencia');req:=gen_random_uuid();result:=public.cp_business_manage(req,'account.pay',account,payload);payment:=(result->>'payment_id')::uuid;result:=public.cp_business_manage(req,'account.pay',account,payload);
+ if exists(select 1 from public.gastos where id=(select expense_id from public.cp_finance_payments where id=payment)and categoria<>'Compras')then raise exception 'Categoría del gasto no conservada';end if;
+ if (select count(*)from public.cp_finance_payments where account_id=account)<>1 then raise exception 'Abono duplicado';end if;
+ begin update public.gastos set monto=1 where id=(select expense_id from public.cp_finance_payments where id=payment);raise exception using errcode='P0002',message='El gasto vinculado se pudo editar';exception when sqlstate 'P0001' then null;end;
+ result:=public.cp_business_manage(gen_random_uuid(),'payment.void',payment,jsonb_build_object('expected_user',u,'reason','QA comprobante incorrecto'));
+ if exists(select 1 from public.gastos where id=(select expense_id from public.cp_finance_payments where id=payment))then raise exception 'Anulación no reflejada en gastos';end if;
+ result:=public.cp_business_manage(gen_random_uuid(),'case.save',case_id,jsonb_build_object('expected_user',u,'subject','QA posventa','customer','QA cliente','status','abierto','priority','urgente'));
+ result:=public.cp_business_manage(gen_random_uuid(),'case.comment',case_id,jsonb_build_object('expected_user',u,'message','QA seguimiento revertido'));
+ perform public.cp_transfer_stock_once(gen_random_uuid(),product,warehouse,warehouse2,1);
+ select sum(cantidad)into stock from public.producto_existencias where producto_id=product;
+ if stock<>2 then raise exception 'Transferencia no conserva existencias';end if;
+ perform set_config('request.jwt.claim.sub',other_user::text,true);
+ if exists(select 1 from public.cp_purchase_orders where id=purchase)or exists(select 1 from public.cp_finance_accounts where id=account)or exists(select 1 from public.cp_service_cases where id=case_id)then raise exception 'Aislamiento entre cuentas falló';end if;
+ reset role;
+end $$;
+rollback;
+select 'OK: compra, recepción única, kardex, abono único, gasto protegido, anulación, posventa, transferencia y aislamiento; pruebas revertidas' as validation;

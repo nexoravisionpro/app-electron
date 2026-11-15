@@ -2419,6 +2419,7 @@ nav.topnav { box-shadow: 0 2px 14px rgba(17,31,53,.04); }
 .crm-editor :is(input,select,textarea):disabled{opacity:.65;cursor:wait}.crm-editor button:disabled{opacity:.5;cursor:not-allowed}.crm-editor .crm-draft-status{margin-bottom:12px;font-size:10px;line-height:1.8}.crm-editor .crm-draft-status.dirty{color:var(--amber)}
 </style>
 <link rel="stylesheet" href="operations.css">
+<link rel="stylesheet" href="management.css">
 </head>
 <body>
 
@@ -8316,12 +8317,13 @@ async function guardarExistenciasProducto() {
   }
   if(!Number.isSafeInteger(sumaMil)||sumaMil<0||sumaMil>999999999999999){showToast('El total de existencias no es válido.', 'error');return;}
   const total=sumaMil/1000;
-  if(changes.length && (!p.nombreRaw||!p.unidad)){showToast('Selecciona una unidad para el producto y actualiza el catálogo antes de ajustar.', 'error');return;}
+  const needsAdjustment=changes.length>0||(Object.keys(expected).length>0&&(p.cantidad==null||String(p.cantidad).trim()===''||!Number.isFinite(Number(p.cantidad))||Math.abs(Number(p.cantidad)-total)>0.0000001));
+  if(needsAdjustment && (!p.nombreRaw||!p.unidad)){showToast('Selecciona una unidad para el producto y actualiza el catálogo antes de ajustar.', 'error');return;}
   let pending=null;
   try {
     pending=cpLeerAjustePendiente(usuario);
-    if(pending && (!changes.length || String(pending.args.p_product_id)!==String(pid))){showToast('Hay un ajuste sin confirmar. Usa «Revisar ajuste pendiente».', 'error');return;}
-    if(changes.length){
+    if(pending && (!needsAdjustment || String(pending.args.p_product_id)!==String(pid))){showToast('Hay un ajuste sin confirmar. Usa «Revisar ajuste pendiente».', 'error');return;}
+    if(needsAdjustment){
       const newName=codificarNombre(p.codigo,p.nombre,String(total),p.unidad,p.costo,p.stockMin,p.pzModo,p.piezas,p.grupoId,p.atributos,p.lotes);
       const args={p_product_id:pid,p_expected_name:p.nombreRaw,p_new_name:newName,p_expected_stock:expected,p_changes:changes,p_expected_total:total};
       if(pending){const {p_request_id,...saved}=pending.args;if(JSON.stringify(saved)!==JSON.stringify(args)){showToast('El ajuste pendiente tiene otros datos. Revísalo antes de continuar.', 'error');return;}}
@@ -14251,6 +14253,7 @@ window.cerrarPromosPanel = function (e) {
     inventory: ['inventory', 'reports', 'history']
   };
   var CP_VIEW_PERMISSIONS = {
+    gestion: 'reports',
     operacion: 'sales',
     inventario: 'inventory',
     'grupo-detalle': 'inventory',
@@ -18418,4 +18421,5 @@ window.cpResetCRM=function(){
 </script>
 <script src="business-math.js"></script>
 <script src="operations.js"></script>
+<script src="management.js"></script>
 </body></html>

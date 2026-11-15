@@ -1,5 +1,5 @@
 name: CorePoint installers for review
-# Incluye expedientes, partidas/PDF, agenda, pagos y reportes (crm.3).
+# Incluye gestión conectada: compras, cobranza, posventa y metas (crm.4).
 
 on:
   workflow_dispatch:
@@ -137,7 +137,7 @@ jobs:
               '', `Fuente: ${context.sha}`, '',
               'Windows x64, Mac Intel x64 y Mac Apple Silicon arm64. Se adjuntan sumas SHA-256 y reportes de arranque.',
               'Sin certificado de editor ni notarización Apple. Mac tiene firma local ad hoc y puede requerir autorización del usuario.',
-              'Versión de revisión: siguen pendientes la validación comercial completa y los cambios del servidor. No se publica como versión estable ni se activa autoactualización.',
+              'Versión de revisión: queda pendiente la validación comercial completa en los dispositivos del negocio. No se publica como versión estable ni se activa autoactualización.',
               '', ...installers.map(asset => `- ${asset.name} (${asset.size} bytes)`),
               '', `Compilación: https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
             ].join('\n');
