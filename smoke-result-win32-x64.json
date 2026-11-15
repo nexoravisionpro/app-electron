@@ -1,0 +1,4 @@
+{
+  "exitCode": 1,
+  "error": "Error: Errores al navegar: [CorePoint ML] TypeError: Cannot read properties of undefined (reading 'getSession')"
+}
