@@ -1,5 +1,5 @@
 name: CorePoint installers for review
-# Incluye gestión conectada: compras, cobranza, posventa y metas (crm.4).
+# Incluye gestión conectada: compras, cobranza, posventa y metas (crm.5; distingue cancelaciones y abonos).
 
 on:
   workflow_dispatch:
