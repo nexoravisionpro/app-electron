@@ -1,4 +1,4 @@
-# Core Point 1.0.3-crm.7 · Operación conectada
+# Core Point 1.0.3-crm.8 · Operación conectada
 
 Conserva los módulos de la entrega anterior y agrega un Centro de gestión accesible desde el menú lateral. También hay accesos desde inventario, CRM, gastos, cotizaciones, empleados, caja y reportes.
 
@@ -33,3 +33,7 @@ Los importes de cuentas manuales deben representar deuda pendiente real. Crear u
 - Los instaladores verifican contenido, arranque y guardado de un PDF a través del puente real del proceso de escritorio, sustituyendo únicamente la selección de carpeta durante la prueba.
 
 Las migraciones documentan los cambios aplicados al proyecto y no deben repetirse a ciegas. Los instaladores son de revisión; falta la prueba operativa completa en los dispositivos del negocio. Windows no tiene certificado de editor y Mac conserva firma ad hoc sin notarización Apple. No se contrataron servicios nuevos.
+
+## Corrección de navegación
+
+El centro de gestión se creaba en el DOM pero la navegación anterior no lo activaba, porque recorría una lista fija de secciones. La navegación ahora reconoce las vistas existentes y conserva la pantalla actual si se solicita una sección inexistente. Se agregó una regresión con el router real y una comprobación nativa que abre todas las pestañas de gestión, sale a otros módulos y vuelve, midiendo visibilidad y capturando la ventana con datos sintéticos.

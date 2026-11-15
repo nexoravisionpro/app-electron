@@ -6466,9 +6466,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function _switchViewReal(name) {
-  ['operacion','dashboard','historial','inventario','grupo-detalle','gastos','agenda','cotizaciones','crm','empleados','inteligencia','caja','config'].forEach(v => {
-    document.getElementById(`view-${v}`)?.classList.toggle('active', v === name);
-    document.getElementById(`sb-${v}`)?.classList.toggle('active', v === name);
+  const target = document.getElementById(`view-${name}`);
+  if (!target || !target.classList.contains('view')) {
+    showToast('No se encontró la sección. La vista actual permanece abierta.', 'error');
+    return false;
+  }
+  document.querySelectorAll('.view[id^="view-"]').forEach(view => {
+    view.classList.toggle('active', view === target);
+  });
+  document.querySelectorAll('#sidebar-nav .sidebar-btn[id]').forEach(button => {
+    button.classList.toggle('active', button.id === `sb-${name}`);
   });
   document.querySelectorAll('.mobile-tab').forEach(el => {
     el.classList.toggle('active', el.dataset.view === name);
@@ -6491,6 +6498,7 @@ function _switchViewReal(name) {
   if (name === 'empleados') renderEmpleados();
   if (name === 'inteligencia' && typeof cpRefreshIntelligence === 'function') cpRefreshIntelligence();
   if (name === 'caja' && typeof cpRenderCash === 'function') cpRenderCash();
+  return true;
 }
 
 // ════════════════════════════════════════════════════

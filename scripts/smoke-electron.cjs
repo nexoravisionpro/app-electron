@@ -2,7 +2,7 @@ const {app}=require('electron'),fs=require('node:fs'),os=require('node:os'),path
 const root=path.resolve(__dirname,'..'),archive=fs.readFileSync(path.join(root,'packaged-app-path.txt'),'utf8').trim();
 app.setPath('userData',fs.mkdtempSync(path.join(os.tmpdir(),'corepoint-ci-')));app.disableHardwareAcceleration();
 let ended=false;const errors=[];
-function finish(code,info){if(ended)return;ended=true;console.log(JSON.stringify(info));app.exit(code)}
+function finish(code,info){if(ended)return;ended=true;try{fs.mkdirSync(path.join(root,'dist'),{recursive:true});fs.writeFileSync(path.join(root,'dist','smoke-result-'+process.platform+'-'+process.arch+'.json'),JSON.stringify({exitCode:code,...info},null,2));}catch(_){}console.log(JSON.stringify(info));app.exit(code)}
 setTimeout(()=>finish(1,{error:'Tiempo de arranque excedido'}),60000).unref();
 app.on('browser-window-created',(_,win)=>{
  win.hide();
@@ -20,7 +20,9 @@ app.on('browser-window-created',(_,win)=>{
    if(!documentResult?.saved)throw Error('Falló el puente de guardado del PDF: '+JSON.stringify(documentResult));
    const pdf=fs.readFileSync(pdfPath);fs.unlinkSync(pdfPath);
    if(!pdf.subarray(0,4).equals(Buffer.from('%PDF')))throw Error('El PDF empaquetado no es válido');
-   const report={startupPassed:true,state,pdfGenerated:true,pdfBytes:pdf.length,scope:'Arranque y generación de PDF desde el código empaquetado; sin iniciar sesión ni operaciones comerciales'};
+   const navigation=await require('./check-navigation.cjs').checkNavigation(win,path.join(root,'dist'));
+   if(errors.length)throw Error('Errores al navegar: '+errors.join(' | '));
+   const report={startupPassed:true,state,pdfGenerated:true,pdfBytes:pdf.length,navigation,scope:'Arranque, PDF y navegación visible del código empaquetado. Perfil temporal y datos sintéticos; sin sesión real ni escrituras.'};
    fs.writeFileSync(path.join(root,'dist','arranque-'+process.platform+'-'+process.arch+'.json'),JSON.stringify(report,null,2));finish(0,report);
   }catch(error){finish(1,{error:String(error)})}
  });

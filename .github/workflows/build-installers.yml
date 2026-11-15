@@ -1,5 +1,5 @@
 name: CorePoint installers for review
-# Incluye gestión conectada: compras, cobranza, posventa y metas (crm.7; gestión conectada y vínculos revisados).
+# Corrige la vista de gestión y verifica la navegación visible con capturas (crm.8).
 
 on:
   workflow_dispatch:
@@ -95,13 +95,17 @@ jobs:
       - name: Start packaged source in native Electron
         run: npx electron scripts/smoke-electron.cjs
       - name: Attach verified files to draft
+        if: always()
         uses: actions/github-script@v7
         env:
           RELEASE_ID: ${{ needs.prepare.outputs.release_id }}
+          QA_PLATFORM: ${{ matrix.platform }}
+          QA_ARCH: ${{ matrix.arch }}
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
+            if (!fs.existsSync('dist')) { core.notice('No hay archivos de compilación para adjuntar.'); return; }
             const release_id = Number(process.env.RELEASE_ID);
             const {data: current} = await github.rest.repos.listReleaseAssets({...context.repo, release_id, per_page: 100});
             const files = fs.readdirSync('dist').filter(name => /\.(exe|dmg|sha256|json)$/.test(name) && !name.includes('builder-'));
@@ -114,6 +118,23 @@ jobs:
                 headers: {'content-type': 'application/octet-stream'},
               });
             }
+            // Capturas de la aplicación real con datos de prueba. Rama separada del producto.
+            const qaBranch = `qa-ui-${context.runId}-${process.env.QA_PLATFORM}-${process.env.QA_ARCH}`;
+            let parent = null;
+            try { parent = (await github.rest.git.getRef({...context.repo, ref: `heads/${qaBranch}`})).data.object.sha; }
+            catch (error) { if (error.status !== 404) throw error; }
+            const qaFiles = fs.readdirSync('dist').filter(name => /^(gestion-inicio|gestion-proveedores|empleados-visible)\.png$/.test(name) || /^(navegacion|smoke-result)-.*\.json$/.test(name));
+            if (!qaFiles.length) { core.notice('No hay capturas de navegación para revisar.'); return; }
+            const qaTree = [];
+            for (const name of qaFiles) {
+              const {data: blob} = await github.rest.git.createBlob({...context.repo, content: fs.readFileSync(path.join('dist',name)).toString('base64'), encoding: 'base64'});
+              qaTree.push({path: name, mode: '100644', type: 'blob', sha: blob.sha});
+            }
+            const {data: tree} = await github.rest.git.createTree({...context.repo, tree: qaTree});
+            const {data: commit} = await github.rest.git.createCommit({...context.repo, message: `QA: navegación visible ${process.platform} ${process.arch}`, tree: tree.sha, parents: parent ? [parent] : []});
+            if (parent) await github.rest.git.updateRef({...context.repo, ref: `heads/${qaBranch}`, sha: commit.sha});
+            else await github.rest.git.createRef({...context.repo, ref: `refs/heads/${qaBranch}`, sha: commit.sha});
+            await core.summary.addLink('Capturas con datos sintéticos', `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${qaBranch}`).write();
             await core.summary.addHeading('Archivos verificados').addList(files).write();
 
   finish:
@@ -133,9 +154,9 @@ jobs:
             const installers = assets.filter(asset => /\.(exe|dmg)$/.test(asset.name));
             const complete = process.env.BUILD_RESULT === 'success' && installers.length === 3;
             const body = [
-              complete ? 'Los tres instaladores se generaron y pasaron la verificación de contenido y arranque.' : 'Compilación incompleta. Revisar los trabajos antes de utilizar los archivos disponibles.',
+              complete ? 'Los tres instaladores pasaron contenido, arranque, PDF y navegación visible con datos de prueba.' : 'Compilación incompleta. Revisar los trabajos antes de utilizar los archivos disponibles.',
               '', `Fuente: ${context.sha}`, '',
-              'Windows x64, Mac Intel x64 y Mac Apple Silicon arm64. Se adjuntan sumas SHA-256 y reportes de arranque.',
+              'Windows x64, Mac Intel x64 y Mac Apple Silicon arm64. Se adjuntan sumas SHA-256 y reportes de arranque y navegación.',
               'Sin certificado de editor ni notarización Apple. Mac tiene firma local ad hoc y puede requerir autorización del usuario.',
               'Versión de revisión: queda pendiente la validación comercial completa en los dispositivos del negocio. No se publica como versión estable ni se activa autoactualización.',
               '', ...installers.map(asset => `- ${asset.name} (${asset.size} bytes)`),
