@@ -1,5 +1,5 @@
 name: CorePoint installers for review
-# Corrige la vista de gestión y verifica la navegación visible con capturas (crm.8).
+# Corrige la vista de gestión y verifica navegación visible y sesión simulada (crm.8).
 
 on:
   workflow_dispatch:
