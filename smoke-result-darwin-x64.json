@@ -1,0 +1,36 @@
+{
+  "exitCode": 0,
+  "startupPassed": true,
+  "state": {
+    "telegram": true,
+    "crm": true,
+    "sessionReset": true,
+    "auth": true,
+    "login": true,
+    "calls": true,
+    "campaigns": true,
+    "unauthenticated": true,
+    "employeeDetails": true,
+    "quoteItems": true,
+    "appointmentCalendar": true,
+    "expensePayments": true,
+    "reportFilters": true,
+    "management": true,
+    "managementTabs": true,
+    "managementForms": true,
+    "managementRetry": true,
+    "pdfBridge": true
+  },
+  "pdfGenerated": true,
+  "pdfBytes": 19618,
+  "navigation": {
+    "passed": true,
+    "viewsChecked": 15,
+    "screenshots": [
+      "gestion-inicio.png",
+      "gestion-proveedores.png",
+      "empleados-visible.png"
+    ]
+  },
+  "scope": "Arranque, PDF y navegación visible del código empaquetado. Perfil temporal y datos sintéticos; sin sesión real ni escrituras."
+}
