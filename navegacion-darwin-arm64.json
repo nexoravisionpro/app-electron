@@ -1,0 +1,186 @@
+{
+  "passed": true,
+  "fixture": "Datos sintéticos y perfil temporal; sin sesión real ni escrituras",
+  "checks": [
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 755.15625,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 1076,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 615.375,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 639,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 615.375,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 750,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 763.96875,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 1015,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 763.96875,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 1015,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 615.375,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 742,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 615.375,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 717,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 615.375,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 618,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 595.375,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 721,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "empleados",
+      "display": "block",
+      "width": 1221,
+      "height": 1438.828125,
+      "active": [
+        "view-empleados"
+      ],
+      "textLength": 1575,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "agenda",
+      "display": "block",
+      "width": 1221,
+      "height": 1211.4375,
+      "active": [
+        "view-agenda"
+      ],
+      "textLength": 532,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gastos",
+      "display": "block",
+      "width": 1221,
+      "height": 871.21875,
+      "active": [
+        "view-gastos"
+      ],
+      "textLength": 600,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "cotizaciones",
+      "display": "block",
+      "width": 1221,
+      "height": 626.4375,
+      "active": [
+        "view-cotizaciones"
+      ],
+      "textLength": 521,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "dashboard",
+      "display": "block",
+      "width": 1221,
+      "height": 645,
+      "active": [
+        "view-dashboard"
+      ],
+      "textLength": 1027,
+      "uncovered": true,
+      "writes": 0
+    },
+    {
+      "view": "gestion",
+      "display": "block",
+      "width": 1221,
+      "height": 755.15625,
+      "active": [
+        "view-gestion"
+      ],
+      "textLength": 1076,
+      "uncovered": true,
+      "writes": 0
+    }
+  ]
+}
