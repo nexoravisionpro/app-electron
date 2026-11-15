@@ -1,4 +1,4 @@
-# Core Point 1.0.3-crm.6 · Operación conectada
+# Core Point 1.0.3-crm.7 · Operación conectada
 
 Conserva los módulos de la entrega anterior y agrega un Centro de gestión accesible desde el menú lateral. También hay accesos desde inventario, CRM, gastos, cotizaciones, empleados, caja y reportes.
 
